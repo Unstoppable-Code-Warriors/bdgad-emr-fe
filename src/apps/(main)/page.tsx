@@ -137,7 +137,6 @@ export default function PatientsPage() {
 
 		patients.forEach((patient) => {
 			let groupKey: string
-			let sortKey: string
 
 			const createdDate = patient.createdAt
 				? new Date(patient.createdAt)
@@ -145,30 +144,24 @@ export default function PatientsPage() {
 
 			if (isNaN(createdDate.getTime())) {
 				groupKey = "Không xác định"
-				sortKey = "9999-99-99"
 			} else {
 				if (groupBy === "day") {
 					groupKey = format(createdDate, "dd/MM/yyyy", { locale: vi })
-					sortKey = format(createdDate, "yyyy-MM-dd")
 				} else if (groupBy === "week") {
 					const weekNumber = format(createdDate, "w", { locale: vi })
 					const year = format(createdDate, "yyyy", { locale: vi })
 					groupKey = `Tuần ${weekNumber} năm ${year}`
-					sortKey = `${year}-${weekNumber.padStart(2, "0")}`
 				} else if (groupBy === "date") {
 					groupKey = `Tháng ${format(createdDate, "MM/yyyy", {
 						locale: vi,
 					})}`
-					sortKey = format(createdDate, "yyyy-MM")
 				} else if (groupBy === "year") {
 					groupKey = `Năm ${format(createdDate, "yyyy", {
 						locale: vi,
 					})}`
-					sortKey = format(createdDate, "yyyy")
 				} else {
 					// Fallback case
 					groupKey = "Không xác định"
-					sortKey = "9999-99-99"
 				}
 			}
 

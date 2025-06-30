@@ -1,5 +1,5 @@
-import { createAuthenticatedApi } from "@/utils/api"
-import { getAccessToken } from "@/stores/auth.store"
+// import { createAuthenticatedApi } from "@/utils/api"
+// import { getAccessToken } from "@/stores/auth.store"
 import type {
 	Patient,
 	MedicalRecord,
@@ -9,13 +9,13 @@ import type {
 } from "@/types/patient"
 
 class PatientService {
-	private getApi() {
-		const token = getAccessToken()
-		if (!token) {
-			throw new Error("Không có token xác thực")
-		}
-		return createAuthenticatedApi(token)
-	}
+	// private getApi() {
+	// 	const token = getAccessToken()
+	// 	if (!token) {
+	// 		throw new Error("Không có token xác thực")
+	// 	}
+	// 	return createAuthenticatedApi(token)
+	// }
 
 	/**
 	 * Get list of patients with filtering and pagination
@@ -23,7 +23,7 @@ class PatientService {
 	async getPatients(
 		params: PatientListParams = {}
 	): Promise<PatientListResponse> {
-		const api = this.getApi()
+		// const api = this.getApi()
 
 		// For now, return mock data
 		// In production, this would be:
@@ -36,7 +36,7 @@ class PatientService {
 	 * Get patient by ID
 	 */
 	async getPatientById(id: string): Promise<Patient> {
-		const api = this.getApi()
+		// const api = this.getApi()
 
 		// For now, return mock data
 		// In production, this would be:
@@ -51,7 +51,7 @@ class PatientService {
 	async getPatientMedicalRecords(
 		patientId: string
 	): Promise<MedicalRecord[]> {
-		const api = this.getApi()
+		// const api = this.getApi()
 
 		// For now, return mock data
 		// In production, this would be:
@@ -64,7 +64,7 @@ class PatientService {
 	 * Get vital signs for a patient
 	 */
 	async getPatientVitalSigns(patientId: string): Promise<VitalSigns[]> {
-		const api = this.getApi()
+		// const api = this.getApi()
 
 		// For now, return mock data
 		// In production, this would be:
@@ -79,7 +79,7 @@ class PatientService {
 	async createPatient(
 		patient: Omit<Patient, "id" | "createdAt" | "updatedAt">
 	): Promise<Patient> {
-		const api = this.getApi()
+		// const api = this.getApi()
 
 		// For now, return mock data
 		// In production, this would be:
@@ -100,7 +100,7 @@ class PatientService {
 		id: string,
 		updates: Partial<Patient>
 	): Promise<Patient> {
-		const api = this.getApi()
+		// const api = this.getApi()
 
 		// For now, return mock data
 		// In production, this would be:
