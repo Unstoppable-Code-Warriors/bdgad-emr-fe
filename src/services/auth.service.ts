@@ -1,6 +1,7 @@
 import type { User } from "@/stores/auth.store"
 import { authApi, createAuthenticatedApi } from "@/utils/api"
 import { getAccessToken } from "@/stores/auth.store"
+import { LOCALIZATION } from "@/utils/localization"
 
 // API response types
 interface LoginResponse {
@@ -19,11 +20,13 @@ interface UserProfileResponse {
 
 interface ForgotPasswordRequest {
 	email: string
+	redirectUrl: string
 }
 
 interface ResetPasswordRequest {
 	token: string
 	newPassword: string
+	confirmPassword: string
 }
 
 interface ChangePasswordRequest {
@@ -62,7 +65,7 @@ class AuthService {
 	async getProfile(): Promise<UserProfileResponse> {
 		const token = getAccessToken()
 		if (!token) {
-			throw new Error("No access token available")
+			throw new Error(LOCALIZATION.ERRORS.UNAUTHORIZED)
 		}
 
 		const authenticatedApi = createAuthenticatedApi(token)
@@ -111,7 +114,7 @@ class AuthService {
 	): Promise<{ message: string }> {
 		const token = getAccessToken()
 		if (!token) {
-			throw new Error("No access token available")
+			throw new Error(LOCALIZATION.ERRORS.UNAUTHORIZED)
 		}
 
 		const authenticatedApi = createAuthenticatedApi(token)

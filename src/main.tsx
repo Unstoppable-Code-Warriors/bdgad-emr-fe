@@ -13,9 +13,9 @@ import LoadingScreen from "./components/screen/loading-screen"
 import { authLoader, nonAuthLoader } from "./utils/loader"
 
 // Import pages
-import LoginPage from "./apps/(auth)/login"
-import ForgotPasswordPage from "./apps/(auth)/forgot-password"
-import ResetPasswordPage from "./apps/(auth)/reset-password"
+import LoginPage from "./apps/auth/login"
+import ForgotPasswordPage from "./apps/auth/forgot-password"
+import ResetPasswordPage from "./apps/auth/reset-password"
 import DashboardPage from "./apps/dashboard"
 
 const routes = createBrowserRouter([

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card"
 import { Eye, EyeOff, Stethoscope, Lock, Mail } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { LOCALIZATION } from "@/utils/localization"
 
 const LoginPage = () => {
 	const { login, isLoading } = useAuth()
@@ -41,13 +42,13 @@ const LoginPage = () => {
 
 		// Basic validation
 		if (!formData.email || !formData.password) {
-			setError("Please fill in all fields")
+			setError(LOCALIZATION.AUTH.LOGIN.VALIDATION.FILL_ALL_FIELDS)
 			setIsSubmitting(false)
 			return
 		}
 
 		if (!formData.email.includes("@")) {
-			setError("Please enter a valid email address")
+			setError(LOCALIZATION.AUTH.LOGIN.VALIDATION.VALID_EMAIL)
 			setIsSubmitting(false)
 			return
 		}
@@ -58,7 +59,7 @@ const LoginPage = () => {
 			const errorMessage =
 				err instanceof Error
 					? err.message
-					: "Login failed. Please try again."
+					: LOCALIZATION.AUTH.LOGIN.VALIDATION.LOGIN_FAILED
 			setError(errorMessage)
 		} finally {
 			setIsSubmitting(false)
@@ -79,10 +80,10 @@ const LoginPage = () => {
 						</div>
 					</div>
 					<CardTitle className="text-2xl font-bold text-gray-900">
-						Medical Professional Login
+						{LOCALIZATION.AUTH.LOGIN.TITLE}
 					</CardTitle>
 					<CardDescription className="text-gray-600">
-						Access your EMR dashboard securely
+						{LOCALIZATION.AUTH.LOGIN.DESCRIPTION}
 					</CardDescription>
 				</CardHeader>
 
@@ -99,7 +100,7 @@ const LoginPage = () => {
 								htmlFor="email"
 								className="text-sm font-medium text-gray-700"
 							>
-								Email Address
+								{LOCALIZATION.AUTH.LOGIN.EMAIL_LABEL}
 							</Label>
 							<div className="relative">
 								<Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -109,7 +110,10 @@ const LoginPage = () => {
 									type="email"
 									value={formData.email}
 									onChange={handleInputChange}
-									placeholder="your.email@hospital.com"
+									placeholder={
+										LOCALIZATION.AUTH.LOGIN
+											.EMAIL_PLACEHOLDER
+									}
 									className="pl-10"
 									disabled={isSubmitting || isLoading}
 									required
@@ -122,7 +126,7 @@ const LoginPage = () => {
 								htmlFor="password"
 								className="text-sm font-medium text-gray-700"
 							>
-								Password
+								{LOCALIZATION.AUTH.LOGIN.PASSWORD_LABEL}
 							</Label>
 							<div className="relative">
 								<Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -132,7 +136,10 @@ const LoginPage = () => {
 									type={showPassword ? "text" : "password"}
 									value={formData.password}
 									onChange={handleInputChange}
-									placeholder="Enter your password"
+									placeholder={
+										LOCALIZATION.AUTH.LOGIN
+											.PASSWORD_PLACEHOLDER
+									}
 									className="pl-10 pr-10"
 									disabled={isSubmitting || isLoading}
 									required
@@ -160,10 +167,10 @@ const LoginPage = () => {
 							{isSubmitting || isLoading ? (
 								<div className="flex items-center justify-center">
 									<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-									Signing in...
+									{LOCALIZATION.AUTH.LOGIN.SUBMITTING}
 								</div>
 							) : (
-								"Sign In"
+								LOCALIZATION.AUTH.LOGIN.SUBMIT_BUTTON
 							)}
 						</Button>
 
@@ -172,15 +179,15 @@ const LoginPage = () => {
 								to="/auth/forgot-password"
 								className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
 							>
-								Forgot your password?
+								{LOCALIZATION.AUTH.LOGIN.FORGOT_PASSWORD}
 							</Link>
 						</div>
 					</form>
 
 					<div className="mt-6 pt-6 border-t border-gray-200">
 						<div className="text-xs text-gray-500 text-center space-y-1">
-							<p>🔒 Secure EMR System Access</p>
-							<p>Only authorized medical professionals</p>
+							<p>{LOCALIZATION.AUTH.LOGIN.SECURE_ACCESS}</p>
+							<p>{LOCALIZATION.AUTH.LOGIN.AUTHORIZED_ONLY}</p>
 						</div>
 					</div>
 				</CardContent>

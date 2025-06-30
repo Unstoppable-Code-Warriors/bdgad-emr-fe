@@ -20,6 +20,7 @@ import {
 	CheckCircle,
 } from "lucide-react"
 import authService from "@/services/auth.service"
+import { LOCALIZATION } from "@/utils/localization"
 
 const ResetPasswordPage = () => {
 	const [searchParams] = useSearchParams()
@@ -38,9 +39,7 @@ const ResetPasswordPage = () => {
 	useEffect(() => {
 		const resetToken = searchParams.get("token")
 		if (!resetToken) {
-			setError(
-				"Invalid or missing reset token. Please request a new password reset."
-			)
+			setError(LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.MISSING_TOKEN)
 			return
 		}
 		setToken(resetToken)
@@ -49,20 +48,27 @@ const ResetPasswordPage = () => {
 	const validatePassword = (password: string): string[] => {
 		const errors: string[] = []
 		if (password.length < 8) {
-			errors.push("Password must be at least 8 characters long")
+			errors.push(LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.MIN_LENGTH)
 		}
 		if (!/(?=.*[a-z])/.test(password)) {
-			errors.push("Password must contain at least one lowercase letter")
+			errors.push(
+				LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.LOWERCASE_REQUIRED
+			)
 		}
 		if (!/(?=.*[A-Z])/.test(password)) {
-			errors.push("Password must contain at least one uppercase letter")
+			errors.push(
+				LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.UPPERCASE_REQUIRED
+			)
 		}
 		if (!/(?=.*\d)/.test(password)) {
-			errors.push("Password must contain at least one number")
+			errors.push(
+				LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.NUMBER_REQUIRED
+			)
 		}
 		if (!/(?=.*[@$!%*?&])/.test(password)) {
 			errors.push(
-				"Password must contain at least one special character (@$!%*?&)"
+				LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION
+					.SPECIAL_CHAR_REQUIRED
 			)
 		}
 		return errors
@@ -85,21 +91,23 @@ const ResetPasswordPage = () => {
 		setIsSubmitting(true)
 
 		if (!token) {
-			setError(
-				"Invalid reset token. Please request a new password reset."
-			)
+			setError(LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.INVALID_TOKEN)
 			setIsSubmitting(false)
 			return
 		}
 
 		if (!formData.newPassword || !formData.confirmPassword) {
-			setError("Please fill in all fields")
+			setError(
+				LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.FILL_ALL_FIELDS
+			)
 			setIsSubmitting(false)
 			return
 		}
 
 		if (formData.newPassword !== formData.confirmPassword) {
-			setError("Passwords do not match")
+			setError(
+				LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.PASSWORDS_NOT_MATCH
+			)
 			setIsSubmitting(false)
 			return
 		}
@@ -112,22 +120,26 @@ const ResetPasswordPage = () => {
 		}
 
 		try {
-			await authService.resetPassword({
+			const res = await authService.resetPassword({
 				token,
 				newPassword: formData.newPassword,
+				confirmPassword: formData.confirmPassword,
 			})
-			setSuccess("Password has been reset successfully!")
+			setSuccess(LOCALIZATION.AUTH.RESET_PASSWORD.SUCCESS_MESSAGE)
 			setFormData({ newPassword: "", confirmPassword: "" })
+			console.log(res)
 
 			// Redirect to login after 3 seconds
 			setTimeout(() => {
 				navigate("/auth/login")
 			}, 3000)
 		} catch (err) {
+			console.log(err)
+
 			const errorMessage =
 				err instanceof Error
 					? err.message
-					: "Failed to reset password. Please try again."
+					: LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.RESET_FAILED
 			setError(errorMessage)
 		} finally {
 			setIsSubmitting(false)
@@ -141,7 +153,9 @@ const ResetPasswordPage = () => {
 					<CardContent className="pt-6">
 						<div className="text-center">
 							<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-							<p className="mt-2 text-gray-600">Loading...</p>
+							<p className="mt-2 text-gray-600">
+								{LOCALIZATION.AUTH.RESET_PASSWORD.LOADING}
+							</p>
 						</div>
 					</CardContent>
 				</Card>
@@ -159,10 +173,10 @@ const ResetPasswordPage = () => {
 						</div>
 					</div>
 					<CardTitle className="text-2xl font-bold text-gray-900">
-						Reset Password
+						{LOCALIZATION.AUTH.RESET_PASSWORD.TITLE}
 					</CardTitle>
 					<CardDescription className="text-gray-600">
-						Enter your new secure password
+						{LOCALIZATION.AUTH.RESET_PASSWORD.DESCRIPTION}
 					</CardDescription>
 				</CardHeader>
 
@@ -178,7 +192,11 @@ const ResetPasswordPage = () => {
 							<Alert className="border-green-200 bg-green-50">
 								<CheckCircle className="h-4 w-4 text-green-600" />
 								<AlertDescription className="text-green-800">
-									{success} Redirecting to login...
+									{success}{" "}
+									{
+										LOCALIZATION.AUTH.RESET_PASSWORD
+											.REDIRECTING
+									}
 								</AlertDescription>
 							</Alert>
 						)}
@@ -190,7 +208,10 @@ const ResetPasswordPage = () => {
 										htmlFor="newPassword"
 										className="text-sm font-medium text-gray-700"
 									>
-										New Password
+										{
+											LOCALIZATION.AUTH.RESET_PASSWORD
+												.NEW_PASSWORD_LABEL
+										}
 									</Label>
 									<div className="relative">
 										<Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -204,7 +225,10 @@ const ResetPasswordPage = () => {
 											}
 											value={formData.newPassword}
 											onChange={handleInputChange}
-											placeholder="Enter new password"
+											placeholder={
+												LOCALIZATION.AUTH.RESET_PASSWORD
+													.NEW_PASSWORD_PLACEHOLDER
+											}
 											className="pl-10 pr-10"
 											disabled={isSubmitting}
 											required
@@ -231,7 +255,10 @@ const ResetPasswordPage = () => {
 										htmlFor="confirmPassword"
 										className="text-sm font-medium text-gray-700"
 									>
-										Confirm New Password
+										{
+											LOCALIZATION.AUTH.RESET_PASSWORD
+												.CONFIRM_PASSWORD_LABEL
+										}
 									</Label>
 									<div className="relative">
 										<Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -245,7 +272,10 @@ const ResetPasswordPage = () => {
 											}
 											value={formData.confirmPassword}
 											onChange={handleInputChange}
-											placeholder="Confirm new password"
+											placeholder={
+												LOCALIZATION.AUTH.RESET_PASSWORD
+													.CONFIRM_PASSWORD_PLACEHOLDER
+											}
 											className="pl-10 pr-10"
 											disabled={isSubmitting}
 											required
@@ -270,18 +300,18 @@ const ResetPasswordPage = () => {
 								</div>
 
 								<div className="text-xs text-gray-600 space-y-1">
-									<p>Password requirements:</p>
+									<p>
+										{
+											LOCALIZATION.AUTH.RESET_PASSWORD
+												.PASSWORD_REQUIREMENTS.TITLE
+										}
+									</p>
 									<ul className="list-disc list-inside space-y-1 ml-2">
-										<li>At least 8 characters long</li>
-										<li>
-											One uppercase and one lowercase
-											letter
-										</li>
-										<li>At least one number</li>
-										<li>
-											At least one special character
-											(@$!%*?&)
-										</li>
+										{LOCALIZATION.AUTH.RESET_PASSWORD.PASSWORD_REQUIREMENTS.ITEMS.map(
+											(item, index) => (
+												<li key={index}>{item}</li>
+											)
+										)}
 									</ul>
 								</div>
 
@@ -293,10 +323,14 @@ const ResetPasswordPage = () => {
 									{isSubmitting ? (
 										<div className="flex items-center justify-center">
 											<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-											Resetting...
+											{
+												LOCALIZATION.AUTH.RESET_PASSWORD
+													.SUBMITTING
+											}
 										</div>
 									) : (
-										"Reset Password"
+										LOCALIZATION.AUTH.RESET_PASSWORD
+											.SUBMIT_BUTTON
 									)}
 								</Button>
 							</>
@@ -308,7 +342,7 @@ const ResetPasswordPage = () => {
 								className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
 							>
 								<ArrowLeft className="w-4 h-4 mr-1" />
-								Back to Login
+								{LOCALIZATION.AUTH.RESET_PASSWORD.BACK_TO_LOGIN}
 							</Link>
 						</div>
 					</form>
@@ -316,11 +350,10 @@ const ResetPasswordPage = () => {
 					<div className="mt-6 pt-6 border-t border-gray-200">
 						<div className="text-xs text-gray-500 text-center space-y-1">
 							<p>
-								🔒 Secure password reset for medical
-								professionals
+								🔒 Đặt lại mật khẩu bảo mật cho chuyên viên y tế
 							</p>
 							<p>
-								Your new password will be encrypted and secure
+								Mật khẩu mới của bạn sẽ được mã hóa và bảo mật
 							</p>
 						</div>
 					</div>

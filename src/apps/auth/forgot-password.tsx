@@ -13,6 +13,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Mail, Stethoscope, CheckCircle } from "lucide-react"
 import authService from "@/services/auth.service"
+import { LOCALIZATION } from "@/utils/localization"
 
 const ForgotPasswordPage = () => {
 	const [email, setEmail] = useState("")
@@ -27,28 +28,29 @@ const ForgotPasswordPage = () => {
 		setIsSubmitting(true)
 
 		if (!email) {
-			setError("Please enter your email address")
+			setError(LOCALIZATION.AUTH.FORGOT_PASSWORD.VALIDATION.ENTER_EMAIL)
 			setIsSubmitting(false)
 			return
 		}
 
 		if (!email.includes("@")) {
-			setError("Please enter a valid email address")
+			setError(LOCALIZATION.AUTH.FORGOT_PASSWORD.VALIDATION.VALID_EMAIL)
 			setIsSubmitting(false)
 			return
 		}
 
 		try {
-			await authService.forgotPassword({ email })
-			setSuccess(
-				"Password reset instructions have been sent to your email address."
-			)
+			await authService.forgotPassword({
+				email,
+				redirectUrl: window.location.origin + "/auth",
+			})
+			setSuccess(LOCALIZATION.AUTH.FORGOT_PASSWORD.SUCCESS_MESSAGE)
 			setEmail("")
 		} catch (err) {
 			const errorMessage =
 				err instanceof Error
 					? err.message
-					: "Failed to send reset email. Please try again."
+					: LOCALIZATION.AUTH.FORGOT_PASSWORD.VALIDATION.RESET_FAILED
 			setError(errorMessage)
 		} finally {
 			setIsSubmitting(false)
@@ -65,10 +67,10 @@ const ForgotPasswordPage = () => {
 						</div>
 					</div>
 					<CardTitle className="text-2xl font-bold text-gray-900">
-						Forgot Password
+						{LOCALIZATION.AUTH.FORGOT_PASSWORD.TITLE}
 					</CardTitle>
 					<CardDescription className="text-gray-600">
-						Enter your email to receive password reset instructions
+						{LOCALIZATION.AUTH.FORGOT_PASSWORD.DESCRIPTION}
 					</CardDescription>
 				</CardHeader>
 
@@ -94,7 +96,7 @@ const ForgotPasswordPage = () => {
 								htmlFor="email"
 								className="text-sm font-medium text-gray-700"
 							>
-								Email Address
+								{LOCALIZATION.AUTH.FORGOT_PASSWORD.EMAIL_LABEL}
 							</Label>
 							<div className="relative">
 								<Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -108,7 +110,10 @@ const ForgotPasswordPage = () => {
 										if (error) setError("")
 										if (success) setSuccess("")
 									}}
-									placeholder="doctor@hospital.com"
+									placeholder={
+										LOCALIZATION.AUTH.FORGOT_PASSWORD
+											.EMAIL_PLACEHOLDER
+									}
 									className="pl-10"
 									disabled={isSubmitting}
 									required
@@ -124,10 +129,13 @@ const ForgotPasswordPage = () => {
 							{isSubmitting ? (
 								<div className="flex items-center justify-center">
 									<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-									Sending...
+									{
+										LOCALIZATION.AUTH.FORGOT_PASSWORD
+											.SUBMITTING
+									}
 								</div>
 							) : (
-								"Send Reset Instructions"
+								LOCALIZATION.AUTH.FORGOT_PASSWORD.SUBMIT_BUTTON
 							)}
 						</Button>
 
@@ -137,7 +145,10 @@ const ForgotPasswordPage = () => {
 								className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
 							>
 								<ArrowLeft className="w-4 h-4 mr-1" />
-								Back to Login
+								{
+									LOCALIZATION.AUTH.FORGOT_PASSWORD
+										.BACK_TO_LOGIN
+								}
 							</Link>
 						</div>
 					</form>
@@ -145,10 +156,11 @@ const ForgotPasswordPage = () => {
 					<div className="mt-6 pt-6 border-t border-gray-200">
 						<div className="text-xs text-gray-500 text-center space-y-1">
 							<p>
-								🔒 Secure password reset for medical
-								professionals
+								{LOCALIZATION.AUTH.FORGOT_PASSWORD.SECURE_RESET}
 							</p>
-							<p>Check your email including spam folder</p>
+							<p>
+								{LOCALIZATION.AUTH.FORGOT_PASSWORD.CHECK_SPAM}
+							</p>
 						</div>
 					</div>
 				</CardContent>

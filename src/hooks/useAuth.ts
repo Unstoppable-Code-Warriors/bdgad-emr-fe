@@ -2,6 +2,7 @@ import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import useAuthStore, { hasUserDoctorRole } from "@/stores/auth.store"
 import { useLogin, useLogout, useUserProfile } from "@/hooks/useUserQuery"
+import { LOCALIZATION } from "@/utils/localization"
 import type { User } from "@/stores/auth.store"
 
 interface LoginCredentials {
@@ -41,14 +42,14 @@ export const useAuth = (): UseAuthReturn => {
 				// Verify the response contains a user with proper role
 				if (!response.user || !hasUserDoctorRole()) {
 					throw new Error(
-						"Unauthorized: Only doctors can access this system"
+						LOCALIZATION.AUTH.LOGIN.VALIDATION.UNAUTHORIZED
 					)
 				}
 
 				// Verify user is active
 				if (response.user.status !== "active") {
 					throw new Error(
-						"Account is deactivated. Please contact administrator."
+						LOCALIZATION.AUTH.LOGIN.VALIDATION.ACCOUNT_DEACTIVATED
 					)
 				}
 

@@ -1,3 +1,5 @@
+import { LOCALIZATION } from "@/utils/localization"
+
 const LoadingScreen = () => (
 	<div className="min-h-screen w-full flex items-center justify-center">
 		<svg
@@ -16,7 +18,7 @@ const LoadingScreen = () => (
 				fill="currentFill"
 			/>
 		</svg>
-		<span className="sr-only">Loading...</span>
+		<span className="sr-only">{LOCALIZATION.COMMON.LOADING}</span>
 	</div>
 )
 
