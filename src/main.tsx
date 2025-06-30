@@ -16,7 +16,9 @@ import { authLoader, nonAuthLoader } from "./utils/loader"
 import LoginPage from "./apps/auth/login"
 import ForgotPasswordPage from "./apps/auth/forgot-password"
 import ResetPasswordPage from "./apps/auth/reset-password"
-import DashboardPage from "./apps/dashboard"
+import MainLayout from "./apps/(main)/layout"
+import PatientsPage from "./apps/(main)/page"
+import PatientDetailsPage from "./apps/(main)/[id]/page"
 
 const routes = createBrowserRouter([
 	{
@@ -27,7 +29,7 @@ const routes = createBrowserRouter([
 		children: [
 			{
 				// Root redirect to dashboard if authenticated, or login if not
-				index: true,
+				path: "",
 				loader: () => {
 					// This will be handled by the auth loader logic
 					try {
@@ -37,30 +39,33 @@ const routes = createBrowserRouter([
 						throw redirectResponse
 					}
 				},
-				element: <DashboardPage />,
-			},
-			{
-				path: "dashboard",
-				loader: authLoader,
-				element: <DashboardPage />,
+				element: <MainLayout />,
+				children: [
+					{
+						index: true,
+						element: <PatientsPage />,
+					},
+					{
+						path: ":id",
+						element: <PatientDetailsPage />,
+					},
+				],
 			},
 			{
 				path: "auth",
 				element: <Outlet />,
+				loader: nonAuthLoader,
 				children: [
 					{
 						path: "login",
-						loader: nonAuthLoader,
 						element: <LoginPage />,
 					},
 					{
 						path: "forgot-password",
-						loader: nonAuthLoader,
 						element: <ForgotPasswordPage />,
 					},
 					{
 						path: "reset-password",
-						loader: nonAuthLoader,
 						element: <ResetPasswordPage />,
 					},
 				],
