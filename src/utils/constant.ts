@@ -1,0 +1,7 @@
+export enum Role {
+    STAFF = 1,
+    LAB_TESTING_TECHNICIAN = 2,
+    ANALYSIS_TECHNICIAN = 3,
+    VALIDATION_TECHNICIAN = 4,
+    DOCTOR = 5
+}
