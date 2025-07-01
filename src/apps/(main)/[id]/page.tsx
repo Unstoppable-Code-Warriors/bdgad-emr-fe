@@ -33,9 +33,7 @@ export default function PatientDetailsPage() {
 	const { data: patient, isLoading, error } = usePatient(id!)
 	const { data: medicalRecords, isLoading: recordsLoading } =
 		usePatientMedicalRecords(id!)
-	const { data: vitalSigns, isLoading: vitalsLoading } = usePatientVitalSigns(
-		id!
-	)
+	const { data: vitalSigns } = usePatientVitalSigns(id!)
 
 	if (isLoading) {
 		return (
@@ -312,13 +310,12 @@ export default function PatientDetailsPage() {
 
 			{/* Main Content Tabs */}
 			<Tabs value={activeTab} onValueChange={setActiveTab}>
-				<TabsList className="grid w-full grid-cols-4">
-					<TabsTrigger value="overview">Tổng quan</TabsTrigger>
+				<TabsList className="grid w-full grid-cols-3">
+					<TabsTrigger value="overview">Thông tin chung</TabsTrigger>
 					<TabsTrigger value="medical-records">
 						Hồ sơ y tế
 					</TabsTrigger>
-					<TabsTrigger value="vitals">Sinh hiệu</TabsTrigger>
-					<TabsTrigger value="medications">Thuốc</TabsTrigger>
+					<TabsTrigger value="medications">Phác đồ</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="overview" className="space-y-6">
@@ -753,191 +750,297 @@ export default function PatientDetailsPage() {
 					)}
 				</TabsContent>
 
-				<TabsContent value="vitals" className="space-y-4">
-					<div className="flex justify-between items-center">
-						<h3 className="text-lg font-semibold">Sinh hiệu</h3>
-					</div>
-
-					{vitalsLoading ? (
-						<div className="text-center py-8">
-							<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-							<p className="mt-2 text-muted-foreground">
-								Đang tải sinh hiệu...
-							</p>
-						</div>
-					) : vitalSigns && vitalSigns.length > 0 ? (
-						<div className="space-y-4">
-							{vitalSigns.map((vital) => (
-								<Card key={vital.id}>
-									<CardHeader>
-										<div className="flex justify-between items-center">
-											<CardTitle className="text-base">
-												{format(
-													new Date(vital.measuredAt),
-													"dd/MM/yyyy HH:mm",
-													{ locale: vi }
-												)}
-											</CardTitle>
-											<Badge variant="outline">
-												{vital.measuredBy}
-											</Badge>
-										</div>
-									</CardHeader>
-									<CardContent>
-										<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-											{vital.temperature && (
-												<div>
-													<p className="text-sm text-muted-foreground">
-														Nhiệt độ
-													</p>
-													<p className="text-xl font-semibold">
-														{vital.temperature}°C
-													</p>
-												</div>
-											)}
-											{vital.bloodPressure && (
-												<div>
-													<p className="text-sm text-muted-foreground">
-														Huyết áp
-													</p>
-													<p className="text-xl font-semibold">
-														{
-															vital.bloodPressure
-																.systolic
-														}
-														/
-														{
-															vital.bloodPressure
-																.diastolic
-														}
-													</p>
-												</div>
-											)}
-											{vital.heartRate && (
-												<div>
-													<p className="text-sm text-muted-foreground">
-														Nhịp tim
-													</p>
-													<p className="text-xl font-semibold">
-														{vital.heartRate} bpm
-													</p>
-												</div>
-											)}
-											{vital.oxygenSaturation && (
-												<div>
-													<p className="text-sm text-muted-foreground">
-														SpO2
-													</p>
-													<p className="text-xl font-semibold">
-														{vital.oxygenSaturation}
-														%
-													</p>
-												</div>
-											)}
-											{vital.respiratoryRate && (
-												<div>
-													<p className="text-sm text-muted-foreground">
-														Nhịp thở
-													</p>
-													<p className="text-xl font-semibold">
-														{vital.respiratoryRate}
-														/phút
-													</p>
-												</div>
-											)}
-											{vital.weight && (
-												<div>
-													<p className="text-sm text-muted-foreground">
-														Cân nặng
-													</p>
-													<p className="text-xl font-semibold">
-														{vital.weight} kg
-													</p>
-												</div>
-											)}
-											{vital.height && (
-												<div>
-													<p className="text-sm text-muted-foreground">
-														Chiều cao
-													</p>
-													<p className="text-xl font-semibold">
-														{vital.height} cm
-													</p>
-												</div>
-											)}
-											{vital.bmi && (
-												<div>
-													<p className="text-sm text-muted-foreground">
-														BMI
-													</p>
-													<p className="text-xl font-semibold">
-														{vital.bmi}
-													</p>
-												</div>
-											)}
-										</div>
-									</CardContent>
-								</Card>
-							))}
-						</div>
-					) : (
-						<div className="text-center py-8">
-							<Activity className="mx-auto h-12 w-12 text-gray-400" />
-							<h3 className="mt-2 text-sm font-medium text-gray-900">
-								Chưa có sinh hiệu
-							</h3>
-							<p className="mt-1 text-sm text-gray-500">
-								Bắt đầu bằng cách thêm sinh hiệu đầu tiên.
-							</p>
-						</div>
-					)}
-				</TabsContent>
-
 				<TabsContent value="medications" className="space-y-4">
 					<div className="flex justify-between items-center">
 						<h3 className="text-lg font-semibold">
-							Thuốc đang sử dụng
+							Phác đồ điều trị
 						</h3>
 					</div>
 
-					{patient.currentMedications.length > 0 ? (
-						<div className="grid gap-4">
-							{patient.currentMedications.map(
-								(medication, index) => (
-									<Card key={index}>
-										<CardContent className="p-4">
-											<div className="flex items-center justify-between">
-												<div className="flex items-center space-x-3">
-													<Pill className="h-8 w-8 text-blue-600" />
-													<div>
-														<p className="font-medium">
-															{medication}
-														</p>
-														<p className="text-sm text-muted-foreground">
-															Đang sử dụng
-														</p>
-													</div>
+					{/* Mock treatment protocol data */}
+					<div className="grid gap-4">
+						<Card>
+							<CardContent className="p-4">
+								<div className="flex items-start justify-between">
+									<div className="flex items-start space-x-3">
+										<Pill className="h-8 w-8 text-blue-600 mt-1" />
+										<div className="flex-1">
+											<p className="font-medium text-lg">
+												Metformin 500mg
+											</p>
+											<p className="text-sm text-muted-foreground mb-2">
+												Thuốc điều trị tiểu đường type 2
+											</p>
+											<div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+												<div>
+													<span className="font-medium">
+														Liều dùng:
+													</span>{" "}
+													2 viên/lần
 												</div>
-												<Badge variant="outline">
-													Đang dùng
-												</Badge>
+												<div>
+													<span className="font-medium">
+														Tần suất:
+													</span>{" "}
+													2 lần/ngày
+												</div>
+												<div>
+													<span className="font-medium">
+														Thời gian:
+													</span>{" "}
+													3 tháng
+												</div>
 											</div>
-										</CardContent>
-									</Card>
-								)
-							)}
-						</div>
-					) : (
-						<div className="text-center py-8">
-							<Pill className="mx-auto h-12 w-12 text-gray-400" />
-							<h3 className="mt-2 text-sm font-medium text-gray-900">
-								Chưa có thuốc
-							</h3>
-							<p className="mt-1 text-sm text-gray-500">
-								Bệnh nhân hiện không sử dụng thuốc nào.
-							</p>
-						</div>
-					)}
+											<p className="text-sm text-blue-600 mt-2">
+												💊 Uống sau ăn, tránh uống rượu
+												bia
+											</p>
+										</div>
+									</div>
+									<Badge
+										variant="default"
+										className="bg-green-100 text-green-800"
+									>
+										Đang dùng
+									</Badge>
+								</div>
+							</CardContent>
+						</Card>
+
+						<Card>
+							<CardContent className="p-4">
+								<div className="flex items-start justify-between">
+									<div className="flex items-start space-x-3">
+										<Pill className="h-8 w-8 text-purple-600 mt-1" />
+										<div className="flex-1">
+											<p className="font-medium text-lg">
+												Amlodipine 5mg
+											</p>
+											<p className="text-sm text-muted-foreground mb-2">
+												Thuốc hạ huyết áp
+											</p>
+											<div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+												<div>
+													<span className="font-medium">
+														Liều dùng:
+													</span>{" "}
+													1 viên/lần
+												</div>
+												<div>
+													<span className="font-medium">
+														Tần suất:
+													</span>{" "}
+													1 lần/ngày
+												</div>
+												<div>
+													<span className="font-medium">
+														Thời gian:
+													</span>{" "}
+													6 tháng
+												</div>
+											</div>
+											<p className="text-sm text-blue-600 mt-2">
+												💊 Uống vào buổi sáng, theo dõi
+												huyết áp
+											</p>
+										</div>
+									</div>
+									<Badge
+										variant="default"
+										className="bg-green-100 text-green-800"
+									>
+										Đang dùng
+									</Badge>
+								</div>
+							</CardContent>
+						</Card>
+
+						<Card>
+							<CardContent className="p-4">
+								<div className="flex items-start justify-between">
+									<div className="flex items-start space-x-3">
+										<Pill className="h-8 w-8 text-orange-600 mt-1" />
+										<div className="flex-1">
+											<p className="font-medium text-lg">
+												Atorvastatin 20mg
+											</p>
+											<p className="text-sm text-muted-foreground mb-2">
+												Thuốc giảm cholesterol
+											</p>
+											<div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+												<div>
+													<span className="font-medium">
+														Liều dùng:
+													</span>{" "}
+													1 viên/lần
+												</div>
+												<div>
+													<span className="font-medium">
+														Tần suất:
+													</span>{" "}
+													1 lần/ngày
+												</div>
+												<div>
+													<span className="font-medium">
+														Thời gian:
+													</span>{" "}
+													6 tháng
+												</div>
+											</div>
+											<p className="text-sm text-blue-600 mt-2">
+												💊 Uống vào buổi tối, kiểm tra
+												chức năng gan định kỳ
+											</p>
+										</div>
+									</div>
+									<Badge
+										variant="default"
+										className="bg-green-100 text-green-800"
+									>
+										Đang dùng
+									</Badge>
+								</div>
+							</CardContent>
+						</Card>
+
+						<Card>
+							<CardContent className="p-4">
+								<div className="flex items-start justify-between">
+									<div className="flex items-start space-x-3">
+										<Pill className="h-8 w-8 text-red-600 mt-1" />
+										<div className="flex-1">
+											<p className="font-medium text-lg">
+												Aspirin 100mg
+											</p>
+											<p className="text-sm text-muted-foreground mb-2">
+												Thuốc chống đông máu
+											</p>
+											<div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+												<div>
+													<span className="font-medium">
+														Liều dùng:
+													</span>{" "}
+													1 viên/lần
+												</div>
+												<div>
+													<span className="font-medium">
+														Tần suất:
+													</span>{" "}
+													1 lần/ngày
+												</div>
+												<div>
+													<span className="font-medium">
+														Thời gian:
+													</span>{" "}
+													Dài hạn
+												</div>
+											</div>
+											<p className="text-sm text-blue-600 mt-2">
+												💊 Uống sau ăn, theo dõi triệu
+												chứng chảy máu
+											</p>
+										</div>
+									</div>
+									<Badge
+										variant="default"
+										className="bg-green-100 text-green-800"
+									>
+										Đang dùng
+									</Badge>
+								</div>
+							</CardContent>
+						</Card>
+
+						<Card>
+							<CardContent className="p-4">
+								<div className="flex items-start justify-between">
+									<div className="flex items-start space-x-3">
+										<Pill className="h-8 w-8 text-gray-400 mt-1" />
+										<div className="flex-1">
+											<p className="font-medium text-lg">
+												Omeprazole 20mg
+											</p>
+											<p className="text-sm text-muted-foreground mb-2">
+												Thuốc bảo vệ dạ dày
+											</p>
+											<div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+												<div>
+													<span className="font-medium">
+														Liều dùng:
+													</span>{" "}
+													1 viên/lần
+												</div>
+												<div>
+													<span className="font-medium">
+														Tần suất:
+													</span>{" "}
+													1 lần/ngày
+												</div>
+												<div>
+													<span className="font-medium">
+														Thời gian:
+													</span>{" "}
+													Hoàn thành
+												</div>
+											</div>
+											<p className="text-sm text-orange-600 mt-2">
+												✅ Đã hoàn thành khóa điều trị 2
+												tháng
+											</p>
+										</div>
+									</div>
+									<Badge
+										variant="secondary"
+										className="bg-gray-100 text-gray-800"
+									>
+										Đã dừng
+									</Badge>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Treatment notes */}
+						<Card className="border-l-4 border-l-blue-500">
+							<CardHeader>
+								<CardTitle className="text-base flex items-center space-x-2">
+									<FileText className="h-4 w-4" />
+									<span>Ghi chú điều trị</span>
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								<ul className="space-y-2 text-sm">
+									<li className="flex items-start space-x-2">
+										<div className="w-2 h-2 bg-blue-600 rounded-full mt-1.5"></div>
+										<span>
+											Theo dõi đường huyết và huyết áp
+											định kỳ mỗi tuần
+										</span>
+									</li>
+									<li className="flex items-start space-x-2">
+										<div className="w-2 h-2 bg-blue-600 rounded-full mt-1.5"></div>
+										<span>
+											Kiểm tra chức năng gan, thận sau 3
+											tháng
+										</span>
+									</li>
+									<li className="flex items-start space-x-2">
+										<div className="w-2 h-2 bg-blue-600 rounded-full mt-1.5"></div>
+										<span>
+											Chế độ ăn ít muối, ít đường, tập thể
+											dục nhẹ
+										</span>
+									</li>
+									<li className="flex items-start space-x-2">
+										<div className="w-2 h-2 bg-blue-600 rounded-full mt-1.5"></div>
+										<span>
+											Tái khám sau 1 tháng hoặc khi có
+											triệu chứng bất thường
+										</span>
+									</li>
+								</ul>
+							</CardContent>
+						</Card>
+					</div>
 				</TabsContent>
 			</Tabs>
 		</div>

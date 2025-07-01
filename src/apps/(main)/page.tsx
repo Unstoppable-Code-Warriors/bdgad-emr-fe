@@ -34,7 +34,7 @@ export default function PatientsPage() {
 		"all" | "active" | "inactive"
 	>("all")
 	const [viewMode, setViewMode] = useState<ViewMode>("table")
-	const [groupBy, setGroupBy] = useState<GroupBy>("date")
+	const [groupBy, setGroupBy] = useState<GroupBy>("day")
 	const [sortBy, setSortBy] = useState<"name" | "date" | "lastVisit">("name")
 	const [sortOrder] = useState<"asc" | "desc">("asc")
 	const [selectedFolder, setSelectedFolder] = useState<string | null>(null)

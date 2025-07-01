@@ -6,7 +6,6 @@ import {
 	LogOut,
 	Menu,
 	Search,
-	Bell,
 	User,
 	FileText,
 } from "lucide-react"
@@ -31,7 +30,6 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import useAuthStore from "@/stores/auth.store"
 
 const navigation = [
@@ -68,16 +66,19 @@ export default function MainLayout() {
 		<SidebarProvider>
 			<div className="min-h-screen w-full flex">
 				<Sidebar className="w-64 flex-shrink-0">
-					<SidebarHeader className="p-6 border-b">
+					<SidebarHeader className="p-4 border-b">
 						<div className="flex items-center space-x-2">
 							<div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
 								<FileText className="h-5 w-5 text-white" />
 							</div>
 							<div>
-								<h1 className="text-lg font-semibold">
-									BDGAD EMR
+								<h1 className="text-lg font-bold">
+									BDGAD{" "}
+									<span className="border-b border-black">
+										EMR
+									</span>
 								</h1>
-								<p className="text-xs text-muted-foreground">
+								<p className="text-sm text-muted-foreground">
 									Hệ thống quản lý hồ sơ y tế
 								</p>
 							</div>
@@ -140,21 +141,6 @@ export default function MainLayout() {
 							</div>
 
 							<div className="flex items-center space-x-4">
-								{/* Notifications */}
-								<Button
-									variant="ghost"
-									size="sm"
-									className="relative"
-								>
-									<Bell className="h-5 w-5" />
-									<Badge
-										variant="destructive"
-										className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-									>
-										3
-									</Badge>
-								</Button>
-
 								{/* User Menu */}
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
