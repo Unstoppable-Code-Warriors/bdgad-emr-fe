@@ -16,6 +16,7 @@ import { authLoader, nonAuthLoader } from "./utils/loader"
 import LoginPage from "./apps/auth/login"
 import ForgotPasswordPage from "./apps/auth/forgot-password"
 import ResetPasswordPage from "./apps/auth/reset-password"
+import CallbackPage from "./apps/auth/callback"
 import MainLayout from "./apps/(main)/layout"
 import PatientsPage from "./apps/(main)/page"
 import PatientDetailsPage from "./apps/(main)/[id]/page"
@@ -68,6 +69,10 @@ const routes = createBrowserRouter([
 						path: "reset-password",
 						element: <ResetPasswordPage />,
 					},
+					{
+						path: "callback",
+						element: <CallbackPage />,
+					},
 				],
 			},
 		],
@@ -75,11 +80,11 @@ const routes = createBrowserRouter([
 ])
 
 createRoot(document.getElementById("root")!).render(
-	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<Toaster />
-			<RouterProvider router={routes} />
-			<ReactQueryDevtools initialIsOpen={false} />
-		</QueryClientProvider>
-	</StrictMode>
+	// <StrictMode>
+	<QueryClientProvider client={queryClient}>
+		<Toaster />
+		<RouterProvider router={routes} />
+		<ReactQueryDevtools initialIsOpen={false} />
+	</QueryClientProvider>
+	// </StrictMode>
 )

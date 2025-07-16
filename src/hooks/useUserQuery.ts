@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import authService from "@/services/auth.service"
 import useAuthStore from "@/stores/auth.store"
-import { useEffect } from "react"
+import { toast } from "sonner"
+import { Role } from "@/utils/constant"
 
 // Query keys
 export const userQueryKeys = {
@@ -13,7 +14,7 @@ export const userQueryKeys = {
  * Hook to get current user profile information
  */
 export const useUserProfile = () => {
-	const { isAuthenticated, setUser, clearAuth } = useAuthStore()
+	const { isAuthenticated, clearAuth } = useAuthStore()
 
 	const query = useQuery({
 		queryKey: userQueryKeys.profile(),
@@ -23,28 +24,15 @@ export const useUserProfile = () => {
 		},
 		enabled: isAuthenticated, // Only run query if user is authenticated
 		staleTime: 5 * 60 * 1000, // 5 minutes
-	})
-
-	// Handle successful data
-	useEffect(() => {
-		if (query.data) {
-			setUser(query.data)
-		}
-	}, [query.data, setUser])
-
-	// Handle errors
-	useEffect(() => {
-		if (query.error) {
-			console.error("Failed to fetch user profile:", query.error)
-			// If unauthorized, clear auth state
-			if (
-				query.error instanceof Error &&
-				query.error.message.includes("401")
-			) {
+		retry: (failureCount, error) => {
+			// Don't retry on 401 errors
+			if (error instanceof Error && error.message.includes("401")) {
 				clearAuth()
+				return false
 			}
-		}
-	}, [query.error, clearAuth])
+			return failureCount < 3
+		},
+	})
 
 	return query
 }
@@ -54,20 +42,43 @@ export const useUserProfile = () => {
  */
 export const useLogin = () => {
 	const queryClient = useQueryClient()
-	const { setUser, setTokens } = useAuthStore()
+	const { setTokens, clearAuth } = useAuthStore()
 
 	return useMutation({
 		mutationFn: authService.login,
-		onSuccess: (data) => {
-			// Store token and user in Zustand
-			setTokens({ token: data.token })
-			setUser(data.user)
+		onSuccess: async (data) => {
+			try {
+				// Store token temporarily
+				setTokens({ token: data.token })
 
-			// Set user data in React Query cache
-			queryClient.setQueryData(userQueryKeys.profile(), data.user)
+				// Fetch user profile to validate role
+				const userResponse = await authService.getProfile()
+				const user = userResponse.user
+
+				// Check if user has doctor role (code "5")
+				const hasValidRole = user.roles.some(
+					(role) => role.code === "5"
+				)
+
+				if (!hasValidRole) {
+					// User doesn't have doctor role - clear tokens and throw error
+					clearAuth()
+					throw new Error(
+						"Hệ thống EMR chỉ dành cho bác sĩ. Tài khoản của bạn không có quyền truy cập."
+					)
+				}
+
+				// User has valid doctor role - clear any cached user data to force refetch
+				queryClient.removeQueries({ queryKey: userQueryKeys.profile() })
+			} catch (error) {
+				// Clear tokens on any validation error
+				clearAuth()
+				throw error
+			}
 		},
 		onError: (error: Error) => {
 			console.error("Login failed:", error)
+			clearAuth()
 		},
 	})
 }

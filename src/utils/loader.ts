@@ -3,122 +3,62 @@ import {
 	getAccessToken,
 	isUserAuthenticated,
 	clearTokensOutside,
-	getCurrentUser,
-	hasUserDoctorRole,
 } from "@/stores/auth.store"
 
 /**
- * Auth loader - Protects routes that require doctor authentication
- * If user doesn't have a valid access token or doctor role, clears tokens and redirects to login
+ * Auth loader - Protects routes that require authentication
+ * If user doesn't have a valid access token, clears tokens and redirects to login
  */
 export const authLoader = () => {
 	const accessToken = getAccessToken()
 	const isAuthenticated = isUserAuthenticated()
-	const user = getCurrentUser()
 
 	// Check if user has access token and is authenticated
-	if (!accessToken || !isAuthenticated || !user) {
+	if (!accessToken || !isAuthenticated) {
 		// Clear any stale tokens
 		clearTokensOutside()
 		// Redirect to login page
 		throw redirect("/auth/login")
 	}
 
-	// Verify user has doctor role
-	if (!hasUserDoctorRole()) {
-		clearTokensOutside()
-		throw redirect("/auth/login")
-	}
-
-	// Verify user is active
-	if (user.status !== "active") {
-		clearTokensOutside()
-		throw redirect("/auth/login")
-	}
-
-	// User is authenticated and authorized, allow access
+	// User is authenticated, allow access
 	return null
 }
 
 /**
  * Non-auth loader - For public routes like login, forgot password, reset password
- * If user already has a valid access token, redirects to dashboard
+ * If user already has a valid access token, redirects to home
+ * Special handling for OAuth callback route
  */
 export const nonAuthLoader = () => {
 	const accessToken = getAccessToken()
 	const isAuthenticated = isUserAuthenticated()
-	const user = getCurrentUser()
 
-	// Check if user is already authenticated and authorized
-	if (
-		accessToken &&
-		isAuthenticated &&
-		user &&
-		user.status === "active" &&
-		hasUserDoctorRole()
-	) {
-		// User is already logged in, redirect to dashboard
-		throw redirect("/dashboard")
+	// Check if this is a callback route - allow access regardless of auth status
+	const currentUrl = new URL(window.location.href)
+	const isCallbackRoute = currentUrl.pathname === "/auth/callback"
+
+	if (isCallbackRoute) {
+		// Allow access to callback route regardless of authentication status
+		return null
+	}
+
+	// Check if this is a password-related request with a token
+	const isPasswordRoute = currentUrl.pathname === "/auth/reset-password"
+	const hasToken = currentUrl.searchParams.has("token")
+
+	// If user is on password page with a token, clear their current session
+	if (isPasswordRoute && hasToken && (accessToken || isAuthenticated)) {
+		clearTokensOutside()
+		return null
+	}
+
+	// Check if user is already authenticated
+	if (accessToken && isAuthenticated) {
+		// User is already logged in, redirect to home
+		throw redirect("/")
 	}
 
 	// User is not authenticated, allow access to public route
-	return null
-}
-
-/**
- * Admin loader - For routes that require senior doctor or head doctor privileges
- */
-export const adminLoader = () => {
-	const accessToken = getAccessToken()
-	const isAuthenticated = isUserAuthenticated()
-	const user = getCurrentUser()
-
-	// Check basic authentication first
-	if (!accessToken || !isAuthenticated || !user) {
-		clearTokensOutside()
-		throw redirect("/auth/login")
-	}
-
-	// Check if user has admin privileges
-	if (!hasUserDoctorRole()) {
-		// Redirect to dashboard if not authorized for admin routes
-		throw redirect("/dashboard")
-	}
-
-	// Verify user is active
-	if (user.status !== "active") {
-		clearTokensOutside()
-		throw redirect("/auth/login")
-	}
-
-	return null
-}
-
-/**
- * Head doctor loader - For routes that require head doctor privileges only
- */
-export const headDoctorLoader = () => {
-	const accessToken = getAccessToken()
-	const isAuthenticated = isUserAuthenticated()
-	const user = getCurrentUser()
-
-	// Check basic authentication first
-	if (!accessToken || !isAuthenticated || !user) {
-		clearTokensOutside()
-		throw redirect("/auth/login")
-	}
-
-	// Check if user has head doctor privileges
-	if (!hasUserDoctorRole()) {
-		// Redirect to dashboard if not authorized
-		throw redirect("/dashboard")
-	}
-
-	// Verify user is active
-	if (user.status !== "active") {
-		clearTokensOutside()
-		throw redirect("/auth/login")
-	}
-
 	return null
 }

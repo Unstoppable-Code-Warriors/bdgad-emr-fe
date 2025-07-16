@@ -1,4 +1,5 @@
-import type { User } from "@/stores/auth.store"
+import type { User } from "@/types/user"
+import type { APIResponse } from "@/utils/api"
 import { authApi, createAuthenticatedApi } from "@/utils/api"
 import { getAccessToken } from "@/stores/auth.store"
 import { LOCALIZATION } from "@/utils/localization"
@@ -6,7 +7,6 @@ import { LOCALIZATION } from "@/utils/localization"
 // API response types
 interface LoginResponse {
 	token: string
-	user: User
 }
 
 interface LoginCredentials {
@@ -34,6 +34,15 @@ interface ChangePasswordRequest {
 	newPassword: string
 }
 
+// Google OAuth types
+interface GoogleOAuthResponse {
+	data: {
+		oauthUrl: string
+		state: string
+	}
+	message: string
+}
+
 class AuthService {
 	/**
 	 * Login user with email and password
@@ -44,6 +53,21 @@ class AuthService {
 				json: credentials,
 			})
 			.json<LoginResponse>()
+
+		return response
+	}
+
+	/**
+	 * Initiate Google OAuth flow
+	 */
+	async initiateGoogleOAuth(
+		redirectAfterLogin: string
+	): Promise<GoogleOAuthResponse> {
+		const response = await authApi
+			.post("auth/google", {
+				json: { redirectAfterLogin },
+			})
+			.json<GoogleOAuthResponse>()
 
 		return response
 	}
@@ -62,7 +86,7 @@ class AuthService {
 	/**
 	 * Get current user profile
 	 */
-	async getProfile(): Promise<UserProfileResponse> {
+	async getProfile(): Promise<APIResponse<UserProfileResponse>> {
 		const token = getAccessToken()
 		if (!token) {
 			throw new Error(LOCALIZATION.ERRORS.UNAUTHORIZED)
@@ -71,7 +95,7 @@ class AuthService {
 		const authenticatedApi = createAuthenticatedApi(token)
 		const response = await authenticatedApi
 			.get("auth/me")
-			.json<UserProfileResponse>()
+			.json<APIResponse<UserProfileResponse>>()
 
 		return response
 	}
