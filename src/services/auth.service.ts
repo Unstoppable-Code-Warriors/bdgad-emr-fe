@@ -6,6 +6,7 @@ import { clearTokensOutside, getAccessToken } from "@/stores/auth.store"
 // API response types
 interface LoginResponse {
 	token: string
+	user: User
 }
 
 interface LoginCredentials {
@@ -52,9 +53,9 @@ class AuthService {
 			.post("auth/login", {
 				json: credentials,
 			})
-			.json<LoginResponse>()
+			.json<ApiResponse<LoginResponse>>()
 
-		return response
+		return response.data
 	}
 
 	/**

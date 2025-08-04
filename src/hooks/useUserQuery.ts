@@ -50,12 +50,8 @@ export const useLogin = () => {
 				// Store token temporarily
 				setTokens({ token: data.token })
 
-				// Fetch user profile to validate role
-				const userResponse = await authService.getProfile()
-				const user = userResponse.data.user
-
-				// Check if user has doctor role (code "5")
-				const hasValidRole = user.roles.some(
+				// Check if user has doctor role (code "5") from login response
+				const hasValidRole = data.user.roles.some(
 					(role: UserRole) => role.code === "5"
 				)
 
