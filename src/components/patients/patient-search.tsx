@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import * as React from "react"
+import { format } from "date-fns"
 import {
 	Card,
 	CardContent,
@@ -20,6 +22,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select"
+import { Calendar } from "@/components/ui/calendar"
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover"
 import {
 	Search,
 	User,
@@ -28,6 +36,7 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Eye,
+	ChevronDown,
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { usePatients } from "@/hooks/use-patients"
@@ -51,8 +60,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 	const [localSearch, setLocalSearch] = useState({
 		name: "",
 		barcode: "",
-		dateFrom: "",
-		dateTo: "",
+		dateFrom: undefined as Date | undefined,
+		dateTo: undefined as Date | undefined,
 	})
 
 	const { data: patientsData, isLoading, error } = usePatients(searchParams)
@@ -60,7 +69,14 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 	const handleSearch = useCallback(() => {
 		setSearchParams((prev) => ({
 			...prev,
-			...localSearch,
+			name: localSearch.name,
+			barcode: localSearch.barcode,
+			dateFrom: localSearch.dateFrom
+				? format(localSearch.dateFrom, "yyyy-MM-dd")
+				: undefined,
+			dateTo: localSearch.dateTo
+				? format(localSearch.dateTo, "yyyy-MM-dd")
+				: undefined,
 			page: 1, // Reset to first page when searching
 		}))
 	}, [localSearch])
@@ -69,8 +85,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 		setLocalSearch({
 			name: "",
 			barcode: "",
-			dateFrom: "",
-			dateTo: "",
+			dateFrom: undefined,
+			dateTo: undefined,
 		})
 		setSearchParams({
 			page: 1,
@@ -135,6 +151,56 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 		)
 	}
 
+	// Date picker component
+	const DatePicker = ({
+		date,
+		onSelect,
+		placeholder = "Chọn ngày...",
+	}: {
+		date: Date | undefined
+		onSelect: (date: Date | undefined) => void
+		placeholder?: string
+	}) => {
+		const [open, setOpen] = React.useState(false)
+
+		return (
+			<Popover open={open} onOpenChange={setOpen}>
+				<PopoverTrigger asChild>
+					<Button
+						variant="outline"
+						className={cn(
+							"w-full justify-between text-left font-normal",
+							!date && "text-muted-foreground"
+						)}
+					>
+						<div className="flex items-center">
+							<CalendarIcon className="mr-2 h-4 w-4" />
+							{date ? format(date, "dd/MM/yyyy") : placeholder}
+						</div>
+						<ChevronDown className="h-4 w-4 opacity-50" />
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent
+					className="w-auto overflow-hidden p-0"
+					align="start"
+				>
+					<Calendar
+						mode="single"
+						selected={date}
+						captionLayout="dropdown"
+						fromYear={1900}
+						toYear={new Date().getFullYear()}
+						onSelect={(selectedDate) => {
+							onSelect(selectedDate)
+							setOpen(false)
+						}}
+						initialFocus
+					/>
+				</PopoverContent>
+			</Popover>
+		)
+	}
+
 	return (
 		<div className="space-y-6">
 			{/* Search Header */}
@@ -193,15 +259,15 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 							<label className="text-sm font-medium">
 								Từ ngày
 							</label>
-							<Input
-								type="date"
-								value={localSearch.dateFrom}
-								onChange={(e) =>
+							<DatePicker
+								date={localSearch.dateFrom}
+								onSelect={(date) =>
 									setLocalSearch((prev) => ({
 										...prev,
-										dateFrom: e.target.value,
+										dateFrom: date,
 									}))
 								}
+								placeholder="Chọn ngày bắt đầu..."
 							/>
 						</div>
 
@@ -209,15 +275,15 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 							<label className="text-sm font-medium">
 								Đến ngày
 							</label>
-							<Input
-								type="date"
-								value={localSearch.dateTo}
-								onChange={(e) =>
+							<DatePicker
+								date={localSearch.dateTo}
+								onSelect={(date) =>
 									setLocalSearch((prev) => ({
 										...prev,
-										dateTo: e.target.value,
+										dateTo: date,
 									}))
 								}
+								placeholder="Chọn ngày kết thúc..."
 							/>
 						</div>
 					</div>
