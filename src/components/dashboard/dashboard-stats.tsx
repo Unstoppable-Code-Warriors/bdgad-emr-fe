@@ -8,7 +8,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Users, TestTube, Calendar, TrendingUp } from "lucide-react"
+import { Users, TestTube, TrendingUp } from "lucide-react"
 import { useDashboardStats } from "@/hooks/use-patients"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -62,7 +62,7 @@ export function DashboardStats({ period = "week" }: DashboardStatsProps) {
 	return (
 		<div className="space-y-6">
 			{/* Main Stats Cards */}
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+			<div className="grid gap-4 md:grid-cols-3">
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">
@@ -97,7 +97,7 @@ export function DashboardStats({ period = "week" }: DashboardStatsProps) {
 					</CardContent>
 				</Card>
 
-				<Card>
+				{/* <Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">
 							XN {periodLabel}
@@ -116,7 +116,7 @@ export function DashboardStats({ period = "week" }: DashboardStatsProps) {
 							Xét nghiệm {periodLabel.toLowerCase()}
 						</p>
 					</CardContent>
-				</Card>
+				</Card> */}
 
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

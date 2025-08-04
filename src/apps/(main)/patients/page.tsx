@@ -1,9 +1,3 @@
-"use client"
-
-import { Badge } from "@/components/ui/badge"
-import { Search } from "lucide-react"
-
-// Import patient components
 import { PatientSearch } from "@/components/patients/patient-search"
 import { ErrorBoundary } from "@/components/ui/error-boundary"
 
@@ -21,15 +15,6 @@ export default function PatientsPage() {
 							<p className="text-sm text-muted-foreground">
 								Tìm kiếm và quản lý thông tin bệnh nhân
 							</p>
-						</div>
-						<div className="flex items-center space-x-2">
-							<Badge
-								variant="secondary"
-								className="flex items-center space-x-1"
-							>
-								<Search className="h-3 w-3" />
-								<span>Tìm kiếm</span>
-							</Badge>
 						</div>
 					</div>
 				</div>

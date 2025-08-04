@@ -1,5 +1,5 @@
 import { useNavigate, useLocation, Link } from "react-router-dom"
-import { Users, Settings, FileText, LayoutDashboard } from "lucide-react"
+import { Users, FileText, LayoutDashboard } from "lucide-react"
 import {
 	Sidebar,
 	SidebarContent,
@@ -22,12 +22,12 @@ const navigation = [
 		icon: Users,
 		current: false,
 	},
-	{
-		name: "Cài đặt",
-		href: "/settings",
-		icon: Settings,
-		current: false,
-	},
+	// {
+	// 	name: "Cài đặt",
+	// 	href: "/settings",
+	// 	icon: Settings,
+	// 	current: false,
+	// },
 ]
 
 export function AppSidebar() {

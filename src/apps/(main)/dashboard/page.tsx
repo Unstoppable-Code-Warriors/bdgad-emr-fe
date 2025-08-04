@@ -9,7 +9,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { LayoutDashboard, Users, BarChart3 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
@@ -19,9 +18,7 @@ import { ErrorBoundary } from "@/components/ui/error-boundary"
 
 export default function DashboardPage() {
 	const navigate = useNavigate()
-	const [selectedPeriod, setSelectedPeriod] = useState<
-		"day" | "week" | "month" | "year"
-	>("week")
+	const [selectedPeriod] = useState<"day" | "week" | "month" | "year">("year")
 
 	return (
 		<ErrorBoundary>
@@ -54,7 +51,7 @@ export default function DashboardPage() {
 				<div className="space-y-4 sm:space-y-6">
 					<div className="space-y-6">
 						{/* Period Selector */}
-						<Card>
+						{/* <Card>
 							<CardHeader>
 								<CardTitle className="flex items-center space-x-2">
 									<BarChart3 className="h-5 w-5" />
@@ -87,7 +84,7 @@ export default function DashboardPage() {
 									</TabsList>
 								</Tabs>
 							</CardContent>
-						</Card>
+						</Card> */}
 
 						{/* Dashboard Stats */}
 						<DashboardStats period={selectedPeriod} />

@@ -1,8 +1,6 @@
-import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Search, Menu, User, Settings, LogOut } from "lucide-react"
+import { Menu, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
 	DropdownMenu,
@@ -20,7 +18,6 @@ export function AppHeader() {
 	const navigate = useNavigate()
 	const { clearAuth } = useAuthStore()
 	const { data: user, isLoading } = useUserProfile()
-	const [searchQuery, setSearchQuery] = useState("")
 
 	const handleLogout = () => {
 		clearAuth()
@@ -34,17 +31,6 @@ export function AppHeader() {
 					<SidebarTrigger>
 						<Menu className="h-5 w-5" />
 					</SidebarTrigger>
-
-					<div className="relative w-96">
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-						<Input
-							type="text"
-							placeholder="Tìm kiếm bệnh nhân, mã BN..."
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							className="pl-10 pr-4"
-						/>
-					</div>
 				</div>
 
 				<div className="flex items-center space-x-4">
@@ -93,15 +79,15 @@ export function AppHeader() {
 								Tài khoản của tôi
 							</DropdownMenuLabel>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem>
+							{/* <DropdownMenuItem>
 								<User className="mr-2 h-4 w-4" />
 								Thông tin cá nhân
 							</DropdownMenuItem>
 							<DropdownMenuItem>
 								<Settings className="mr-2 h-4 w-4" />
 								Cài đặt
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
+							</DropdownMenuItem> */}
+							{/* <DropdownMenuSeparator /> */}
 							<DropdownMenuItem onClick={handleLogout}>
 								<LogOut className="mr-2 h-4 w-4" />
 								Đăng xuất
