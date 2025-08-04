@@ -109,14 +109,14 @@ export const useLogout = () => {
 /**
  * Hook to change password
  */
-export const useChangePassword = () => {
-	return useMutation({
-		mutationFn: authService.changePassword,
-		onError: (error: Error) => {
-			console.error("Change password failed:", error)
-		},
-	})
-}
+// export const useChangePassword = () => {
+// 	return useMutation({
+// 		mutationFn: authService.changePassword,
+// 		onError: (error: Error) => {
+// 			console.error("Change password failed:", error)
+// 		},
+// 	})
+// }
 
 /**
  * Hook to forgot password
@@ -145,23 +145,23 @@ export const useResetPassword = () => {
 /**
  * Hook to verify email
  */
-export const useVerifyEmail = () => {
-	return useMutation({
-		mutationFn: authService.verifyEmail,
-		onError: (error: Error) => {
-			console.error("Email verification failed:", error)
-		},
-	})
-}
+// export const useVerifyEmail = () => {
+// 	return useMutation({
+// 		mutationFn: authService.verifyEmail,
+// 		onError: (error: Error) => {
+// 			console.error("Email verification failed:", error)
+// 		},
+// 	})
+// }
 
 /**
  * Hook to check if email exists
  */
-export const useCheckEmail = () => {
-	return useMutation({
-		mutationFn: authService.checkEmail,
-		onError: (error: Error) => {
-			console.error("Check email failed:", error)
-		},
-	})
-}
+// export const useCheckEmail = () => {
+// 	return useMutation({
+// 		mutationFn: authService.checkEmail,
+// 		onError: (error: Error) => {
+// 			console.error("Check email failed:", error)
+// 		},
+// 	})
+// }

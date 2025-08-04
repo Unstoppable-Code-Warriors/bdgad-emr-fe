@@ -260,7 +260,7 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 						<CardHeader>
 							<CardTitle>Kết Quả Xét Nghiệm Gần Đây</CardTitle>
 							<CardDescription>
-								5 kết quả xét nghiệm mới nhất
+								Kết quả xét nghiệm
 							</CardDescription>
 						</CardHeader>
 						<CardContent>

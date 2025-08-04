@@ -33,10 +33,10 @@ export const useAuth = (): UseAuthReturn => {
 	const login = useCallback(
 		async (credentials: LoginCredentials) => {
 			try {
-				const response = await loginMutation.mutateAsync(credentials)
+				await loginMutation.mutateAsync(credentials)
 
-				// Navigate to home after successful login
-				navigate("/")
+				// Navigate to dashboard after successful login
+				navigate("/dashboard")
 			} catch (error) {
 				clearAuthState()
 				throw error

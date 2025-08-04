@@ -1,5 +1,5 @@
 import { useNavigate, useLocation, Link } from "react-router-dom"
-import { Users, Settings, FileText } from "lucide-react"
+import { Users, Settings, FileText, LayoutDashboard } from "lucide-react"
 import {
 	Sidebar,
 	SidebarContent,
@@ -11,10 +11,16 @@ import {
 
 const navigation = [
 	{
+		name: "Dashboard",
+		href: "/dashboard",
+		icon: LayoutDashboard,
+		current: false,
+	},
+	{
 		name: "Bệnh nhân",
-		href: "/",
+		href: "/patients",
 		icon: Users,
-		current: true,
+		current: false,
 	},
 	{
 		name: "Cài đặt",
@@ -29,8 +35,7 @@ export function AppSidebar() {
 	const location = useLocation()
 
 	const currentPath = location.pathname
-	const isPatientDetail = /^\/\d+$/.test(currentPath)
-	const isHomePage = currentPath === "/"
+	const isPatientDetail = /^\/patients\/\d+$/.test(currentPath)
 
 	return (
 		<Sidebar className="w-64 flex-shrink-0">
@@ -39,7 +44,7 @@ export function AppSidebar() {
 					<div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
 						<FileText className="h-5 w-5 text-white" />
 					</div>
-					<Link to="/">
+					<Link to="/dashboard">
 						<h1 className="text-lg font-bold">
 							BDGAD{" "}
 							<span className="border-b border-black">EMR</span>
@@ -55,9 +60,9 @@ export function AppSidebar() {
 				<SidebarMenu>
 					{navigation.map((item) => {
 						const isActive =
-							item.href === "/"
-								? isHomePage || isPatientDetail
-								: currentPath.startsWith(item.href)
+							item.href === "/patients"
+								? currentPath === "/patients" || isPatientDetail
+								: currentPath === item.href
 
 						return (
 							<SidebarMenuItem key={item.name}>

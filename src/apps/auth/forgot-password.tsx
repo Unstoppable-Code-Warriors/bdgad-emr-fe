@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Mail, Stethoscope, CheckCircle } from "lucide-react"
-import authService from "@/services/auth.service"
 import { LOCALIZATION } from "@/utils/localization"
 
 const ForgotPasswordPage = () => {
@@ -39,22 +38,22 @@ const ForgotPasswordPage = () => {
 			return
 		}
 
-		try {
-			await authService.forgotPassword({
-				email,
-				redirectUrl: window.location.origin + "/auth",
-			})
-			setSuccess(LOCALIZATION.AUTH.FORGOT_PASSWORD.SUCCESS_MESSAGE)
-			setEmail("")
-		} catch (err) {
-			const errorMessage =
-				err instanceof Error
-					? err.message
-					: LOCALIZATION.AUTH.FORGOT_PASSWORD.VALIDATION.RESET_FAILED
-			setError(errorMessage)
-		} finally {
-			setIsSubmitting(false)
-		}
+		// try {
+		// 	await authService.forgotPassword({
+		// 		email,
+		// 		redirectUrl: window.location.origin + "/auth",
+		// 	})
+		// 	setSuccess(LOCALIZATION.AUTH.FORGOT_PASSWORD.SUCCESS_MESSAGE)
+		// 	setEmail("")
+		// } catch (err) {
+		// 	const errorMessage =
+		// 		err instanceof Error
+		// 			? err.message
+		// 			: LOCALIZATION.AUTH.FORGOT_PASSWORD.VALIDATION.RESET_FAILED
+		// 	setError(errorMessage)
+		// } finally {
+		// 	setIsSubmitting(false)
+		// }
 	}
 
 	return (

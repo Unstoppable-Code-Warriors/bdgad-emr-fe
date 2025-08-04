@@ -29,6 +29,7 @@ import {
 	ChevronRight,
 	Eye,
 } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { usePatients } from "@/hooks/use-patients"
 import type { PatientSearchParams, PatientSummary } from "@/types/patient"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -39,6 +40,7 @@ interface PatientSearchProps {
 }
 
 export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
+	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useState<PatientSearchParams>({
 		page: 1,
 		limit: 10,
@@ -302,7 +304,15 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 								<div
 									key={patient.patientKey}
 									className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-									onClick={() => onPatientSelect?.(patient)}
+									onClick={() => {
+										if (onPatientSelect) {
+											onPatientSelect(patient)
+										} else {
+											navigate(
+												`/patients/${patient.patientKey}`
+											)
+										}
+									}}
 								>
 									<div className="flex items-center space-x-4">
 										<Avatar className="h-12 w-12">
@@ -362,6 +372,16 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 											variant="outline"
 											size="sm"
 											className="mt-2"
+											onClick={(e) => {
+												e.stopPropagation()
+												if (onPatientSelect) {
+													onPatientSelect(patient)
+												} else {
+													navigate(
+														`/patients/${patient.patientKey}`
+													)
+												}
+											}}
 										>
 											<Eye className="h-3 w-3 mr-1" />
 											Chi tiết

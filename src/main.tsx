@@ -23,8 +23,9 @@ import ForgotPasswordPage from "./apps/auth/forgot-password"
 import ResetPasswordPage from "./apps/auth/reset-password"
 import CallbackPage from "./apps/auth/callback"
 import MainLayout from "./apps/(main)/layout"
-import PatientsPage from "./apps/(main)/page"
-import PatientDetailsPage from "./apps/(main)/[id]/page"
+import DashboardPage from "./apps/(main)/dashboard/page"
+import PatientsPage from "./apps/(main)/patients/page"
+import PatientDetailsPage from "./apps/(main)/patients/[id]/page"
 
 const routes = createBrowserRouter([
 	{
@@ -40,12 +41,20 @@ const routes = createBrowserRouter([
 				element: <MainLayout />,
 				children: [
 					{
-						index: true,
+						path: "dashboard",
+						element: <DashboardPage />,
+					},
+					{
+						path: "patients",
 						element: <PatientsPage />,
 					},
 					{
-						path: ":id",
+						path: "patients/:id",
 						element: <PatientDetailsPage />,
+					},
+					{
+						index: true,
+						element: <DashboardPage />, // Redirect root to dashboard
 					},
 				],
 			},
