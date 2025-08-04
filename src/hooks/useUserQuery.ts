@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import authService from "@/services/auth.service"
 import useAuthStore from "@/stores/auth.store"
-import { toast } from "sonner"
-import { Role } from "@/utils/constant"
+import type { UserRole } from "@/types/user"
 
 // Query keys
 export const userQueryKeys = {
@@ -20,7 +19,7 @@ export const useUserProfile = () => {
 		queryKey: userQueryKeys.profile(),
 		queryFn: async () => {
 			const response = await authService.getProfile()
-			return response.user
+			return response.data.user
 		},
 		enabled: isAuthenticated, // Only run query if user is authenticated
 		staleTime: 5 * 60 * 1000, // 5 minutes
@@ -53,11 +52,11 @@ export const useLogin = () => {
 
 				// Fetch user profile to validate role
 				const userResponse = await authService.getProfile()
-				const user = userResponse.user
+				const user = userResponse.data.user
 
 				// Check if user has doctor role (code "5")
 				const hasValidRole = user.roles.some(
-					(role) => role.code === "5"
+					(role: UserRole) => role.code === "5"
 				)
 
 				if (!hasValidRole) {

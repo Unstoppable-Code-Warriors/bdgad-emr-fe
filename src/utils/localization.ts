@@ -3,7 +3,7 @@ export const LOCALIZATION = {
 	// Authentication
 	AUTH: {
 		LOGIN: {
-			TITLE: "Đăng nhập chuyên viên y tế",
+			TITLE: "Đăng nhập vào hệ thống EMR",
 			DESCRIPTION: "Truy cập bảng điều khiển EMR một cách bảo mật",
 			EMAIL_LABEL: "Địa chỉ email",
 			EMAIL_PLACEHOLDER: "email.cua.ban@benhvien.com",
@@ -13,7 +13,7 @@ export const LOCALIZATION = {
 			SUBMITTING: "Đang đăng nhập...",
 			FORGOT_PASSWORD: "Quên mật khẩu?",
 			SECURE_ACCESS: "🔒 Truy cập hệ thống EMR bảo mật",
-			AUTHORIZED_ONLY: "Chỉ dành cho chuyên viên y tế được ủy quyền",
+			AUTHORIZED_ONLY: "Chỉ dành cho bác sĩ được ủy quyền",
 			VALIDATION: {
 				FILL_ALL_FIELDS: "Vui lòng điền đầy đủ thông tin",
 				VALID_EMAIL: "Vui lòng nhập địa chỉ email hợp lệ",
@@ -197,9 +197,16 @@ export const LOCALIZATION = {
 
 // Helper function to get nested values safely
 export const getLocalizationText = (path: string): string => {
-	return path.split(".").reduce((obj: any, key: string) => {
-		return obj?.[key] || path
-	}, LOCALIZATION)
+	return path.split(".").reduce(
+		(
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			obj: any,
+			key: string
+		) => {
+			return obj?.[key] || path
+		},
+		LOCALIZATION
+	)
 }
 
 export default LOCALIZATION

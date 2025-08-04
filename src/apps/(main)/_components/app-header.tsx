@@ -14,10 +14,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import useAuthStore from "@/stores/auth.store"
+import { useUserProfile } from "@/hooks/useUserQuery"
 
 export function AppHeader() {
 	const navigate = useNavigate()
-	const { user, clearAuth } = useAuthStore()
+	const { clearAuth } = useAuthStore()
+	const { data: user, isLoading } = useUserProfile()
 	const [searchQuery, setSearchQuery] = useState("")
 
 	const handleLogout = () => {
@@ -52,23 +54,36 @@ export function AppHeader() {
 							<Button
 								variant="ghost"
 								className="flex items-center space-x-2"
+								disabled={isLoading}
 							>
 								<Avatar className="h-8 w-8">
-									<AvatarImage src="" alt={user?.name} />
-									<AvatarFallback>
-										{user?.name
-											?.split(" ")
-											.map((n) => n[0])
-											.join("")
-											.toUpperCase() || "U"}
+									<AvatarImage
+										src={
+											user?.metadata?.googlePicture || ""
+										}
+										alt={user?.name || "User avatar"}
+										className="object-cover"
+									/>
+									<AvatarFallback className="bg-blue-100 text-blue-600 font-medium">
+										{isLoading
+											? "..."
+											: user?.name
+													?.split(" ")
+													.map((n: string) => n[0])
+													.join("")
+													.toUpperCase() || "U"}
 									</AvatarFallback>
 								</Avatar>
 								<div className="hidden md:block text-left">
 									<p className="text-sm font-medium">
-										{user?.name}
+										{isLoading
+											? "Loading..."
+											: user?.name || "User"}
 									</p>
 									<p className="text-xs text-muted-foreground">
-										{user?.email}
+										{isLoading
+											? "Loading..."
+											: user?.email || "No email"}
 									</p>
 								</div>
 							</Button>

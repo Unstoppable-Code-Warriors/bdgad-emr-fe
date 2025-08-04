@@ -8,6 +8,8 @@ export interface UserRole {
 export interface UserMetadata {
 	phone: string
 	address: string
+	googlePicture?: string
+	lastGoogleLogin?: string
 }
 
 export interface User {
