@@ -137,8 +137,15 @@ const CallbackPage = () => {
 	}
 
 	useEffect(() => {
-		handleCallback()
-	}, [searchParams, navigate, setTokens])
+		const processCallback = async () => {
+			// Only run once
+			if (processing) {
+				await handleCallback()
+			}
+		}
+
+		processCallback()
+	}, []) // Remove dependencies to prevent infinite loop
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">

@@ -1,245 +1,277 @@
-import { useState, useMemo } from "react"
-import { usePatients } from "@/hooks/use-patients"
-import type { Patient } from "@/types/patient"
-import { format } from "date-fns"
-import { vi } from "date-fns/locale"
+"use client"
 
-// Import components
+import { useState } from "react"
 import {
-	PatientsHeader,
-	PatientsFilters,
-	PatientsTable,
-	TimeFolders,
-	PatientsEmptyState,
-} from "./_components"
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import {
+	LayoutDashboard,
+	Users,
+	Search,
+	ArrowLeft,
+	BarChart3,
+} from "lucide-react"
 
-type ViewMode = "table"
-type GroupBy = "date" | "week" | "year" | "day"
+// Import các component đã tạo
+import { DashboardStats } from "@/components/dashboard/dashboard-stats"
+import { PatientSearch } from "@/components/patients/patient-search"
+import { PatientDetails } from "@/components/patients/patient-details"
+import { ErrorBoundary } from "@/components/ui/error-boundary"
+// import { ApiStatus } from '@/components/common/api-status';
+import type { PatientSummary } from "@/types/patient"
 
-interface TimeFolder {
-	key: string
-	label: string
-	count: number
-	patients: Patient[]
-}
+type ViewMode = "dashboard" | "search" | "details"
 
 export default function PatientsPage() {
-	const [searchQuery, setSearchQuery] = useState("")
-	const [statusFilter, setStatusFilter] = useState<
-		"all" | "active" | "inactive"
-	>("all")
-	const [viewMode, setViewMode] = useState<ViewMode>("table")
-	const [groupBy, setGroupBy] = useState<GroupBy>("day")
-	const [sortBy, setSortBy] = useState<"name" | "date" | "lastVisit">("name")
-	const [sortOrder] = useState<"asc" | "desc">("asc")
-	const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
+	const [currentView, setCurrentView] = useState<ViewMode>("dashboard")
+	console.log("Current view state initialized:", currentView)
+	const [selectedPatient, setSelectedPatient] =
+		useState<PatientSummary | null>(null)
+	const [selectedPeriod, setSelectedPeriod] = useState<
+		"day" | "week" | "month" | "year"
+	>("week")
 
-	const {
-		data: patientsData,
-		isLoading,
-		error,
-	} = usePatients({
-		search: searchQuery,
-		status: statusFilter,
-		sortBy,
-		sortOrder,
-		limit: 50,
-	})
+	const handlePatientSelect = (patient: PatientSummary) => {
+		setSelectedPatient(patient)
+		setCurrentView("details")
+	}
 
-	const timeFolders = useMemo((): TimeFolder[] => {
-		if (!patientsData?.patients) {
-			return []
-		}
+	const handleBackToSearch = () => {
+		setSelectedPatient(null)
+		setCurrentView("search")
+	}
 
-		const patients = patientsData.patients
-		const groups: Record<string, Patient[]> = {}
+	const handleBackToDashboard = () => {
+		setSelectedPatient(null)
+		setCurrentView("dashboard")
+	}
 
-		patients.forEach((patient) => {
-			let groupKey: string
+	const renderHeader = () => {
+		switch (currentView) {
+			case "dashboard":
+				return (
+					<div className="flex items-center justify-between">
+						<div className="space-y-1">
+							<h2 className="text-2xl font-semibold tracking-tight">
+								Dashboard
+							</h2>
+							<p className="text-sm text-muted-foreground">
+								Tổng quan thống kê hệ thống EMR
+							</p>
+						</div>
+						<div className="flex items-center space-x-2">
+							<Button
+								variant="outline"
+								onClick={() => setCurrentView("search")}
+								className="flex items-center space-x-2"
+							>
+								<Users className="h-4 w-4" />
+								<span>Quản lý bệnh nhân</span>
+							</Button>
+						</div>
+					</div>
+				)
 
-			const createdDate = patient.createdAt
-				? new Date(patient.createdAt)
-				: new Date()
+			case "search":
+				return (
+					<div className="flex items-center justify-between">
+						<div className="flex items-center space-x-4">
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={handleBackToDashboard}
+								className="flex items-center space-x-2"
+							>
+								<ArrowLeft className="h-4 w-4" />
+								<span>Dashboard</span>
+							</Button>
+							<div className="space-y-1">
+								<h2 className="text-2xl font-semibold tracking-tight">
+									Quản lý bệnh nhân
+								</h2>
+								<p className="text-sm text-muted-foreground">
+									Tìm kiếm và quản lý thông tin bệnh nhân
+								</p>
+							</div>
+						</div>
+						<div className="flex items-center space-x-2">
+							<Badge
+								variant="secondary"
+								className="flex items-center space-x-1"
+							>
+								<Search className="h-3 w-3" />
+								<span>Tìm kiếm</span>
+							</Badge>
+						</div>
+					</div>
+				)
 
-			if (isNaN(createdDate.getTime())) {
-				groupKey = "Không xác định"
-			} else {
-				if (groupBy === "day") {
-					groupKey = format(createdDate, "dd/MM/yyyy", { locale: vi })
-				} else if (groupBy === "week") {
-					const weekNumber = format(createdDate, "w", { locale: vi })
-					const year = format(createdDate, "yyyy", { locale: vi })
-					groupKey = `Tuần ${weekNumber} năm ${year}`
-				} else if (groupBy === "date") {
-					groupKey = `Tháng ${format(createdDate, "MM/yyyy", {
-						locale: vi,
-					})}`
-				} else if (groupBy === "year") {
-					groupKey = `Năm ${format(createdDate, "yyyy", {
-						locale: vi,
-					})}`
-				} else {
-					// Fallback case
-					groupKey = "Không xác định"
-				}
-			}
+			case "details":
+				return (
+					<div className="flex items-center justify-between">
+						<div className="flex items-center space-x-4">
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={handleBackToSearch}
+								className="flex items-center space-x-2"
+							>
+								<ArrowLeft className="h-4 w-4" />
+								<span>Danh sách bệnh nhân</span>
+							</Button>
+							<div className="space-y-1">
+								<h2 className="text-2xl font-semibold tracking-tight">
+									Chi tiết bệnh nhân
+								</h2>
+								<p className="text-sm text-muted-foreground">
+									Thông tin chi tiết và lịch sử xét nghiệm
+								</p>
+							</div>
+						</div>
+						<div className="flex items-center space-x-2">
+							<Badge
+								variant="secondary"
+								className="flex items-center space-x-1"
+							>
+								<Users className="h-3 w-3" />
+								<span>{selectedPatient?.fullName}</span>
+							</Badge>
+						</div>
+					</div>
+				)
 
-			if (!groups[groupKey]) {
-				groups[groupKey] = []
-			}
-			groups[groupKey].push(patient)
-		})
-
-		// Convert to folders and sort by date (newest first)
-		const folders = Object.entries(groups).map(([key, patients]) => ({
-			key,
-			label: key,
-			count: patients.length,
-			patients,
-		}))
-
-		return folders.sort((a, b) => {
-			if (a.key === "Không xác định") return 1
-			if (b.key === "Không xác định") return -1
-
-			// Extract date for sorting
-			const extractSortKey = (label: string) => {
-				// Handle day format "dd/MM/yyyy"
-				const dayMatch = label.match(/(\d{2})\/(\d{2})\/(\d{4})/)
-				if (dayMatch) {
-					return `${dayMatch[3]}-${dayMatch[2]}-${dayMatch[1]}`
-				}
-
-				// Handle week format "Tuần X năm YYYY"
-				const weekMatch = label.match(/Tuần (\d+) năm (\d{4})/)
-				if (weekMatch) {
-					return `${weekMatch[2]}-${weekMatch[1].padStart(2, "0")}`
-				}
-
-				// Handle month format "Tháng MM/YYYY"
-				const monthMatch = label.match(/Tháng (\d{2})\/(\d{4})/)
-				if (monthMatch) {
-					return `${monthMatch[2]}-${monthMatch[1]}`
-				}
-
-				// Handle year format "Năm YYYY"
-				const yearMatch = label.match(/Năm (\d{4})/)
-				if (yearMatch) {
-					return yearMatch[1]
-				}
-
-				return "0000"
-			}
-
-			return extractSortKey(b.label).localeCompare(
-				extractSortKey(a.label)
-			)
-		})
-	}, [patientsData?.patients, groupBy])
-
-	// Check if we should show search results directly
-	const isSearchMode = searchQuery.trim().length > 0
-
-	// Get selected folder data
-	const selectedFolderData = selectedFolder
-		? timeFolders.find((folder) => folder.key === selectedFolder) || null
-		: null
-
-	const handleSearchChange = (value: string) => {
-		setSearchQuery(value)
-		// Reset folder selection when searching
-		if (value.trim()) {
-			setSelectedFolder(null)
+			default:
+				return null
 		}
 	}
 
-	const handleGroupByChange = (value: GroupBy) => {
-		setGroupBy(value)
-		setSelectedFolder(null) // Reset folder selection
-	}
+	const renderContent = () => {
+		switch (currentView) {
+			case "dashboard":
+				return (
+					<div className="space-y-6">
+						{/* Period Selector */}
+						<Card>
+							<CardHeader>
+								<CardTitle className="flex items-center space-x-2">
+									<BarChart3 className="h-5 w-5" />
+									<span>Thống kê theo thời gian</span>
+								</CardTitle>
+								<CardDescription>
+									Chọn khoảng thời gian để xem thống kê
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<Tabs
+									value={selectedPeriod}
+									onValueChange={(value) =>
+										setSelectedPeriod(value as any)
+									}
+								>
+									<TabsList className="grid w-full grid-cols-4">
+										<TabsTrigger value="day">
+											Hôm nay
+										</TabsTrigger>
+										<TabsTrigger value="week">
+											Tuần này
+										</TabsTrigger>
+										<TabsTrigger value="month">
+											Tháng này
+										</TabsTrigger>
+										<TabsTrigger value="year">
+											Năm này
+										</TabsTrigger>
+									</TabsList>
+								</Tabs>
+							</CardContent>
+						</Card>
 
-	if (error) {
-		return (
-			<div className="p-6">
-				<div className="text-center text-red-600">
-					Có lỗi xảy ra khi tải dữ liệu bệnh nhân
-				</div>
-			</div>
-		)
+						{/* Dashboard Stats */}
+						<DashboardStats period={selectedPeriod} />
+
+						{/* API Status */}
+						{/* <ApiStatus /> */}
+
+						{/* Quick Actions */}
+						<Card>
+							<CardHeader>
+								<CardTitle>Thao tác nhanh</CardTitle>
+								<CardDescription>
+									Các chức năng thường sử dụng
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+									<Button
+										variant="outline"
+										className="h-20 flex flex-col items-center space-y-2"
+										onClick={() => setCurrentView("search")}
+									>
+										<Users className="h-6 w-6" />
+										<span>Tìm kiếm bệnh nhân</span>
+									</Button>
+									<Button
+										variant="outline"
+										className="h-20 flex flex-col items-center space-y-2"
+										disabled
+									>
+										<LayoutDashboard className="h-6 w-6" />
+										<span>Báo cáo chi tiết</span>
+									</Button>
+									<Button
+										variant="outline"
+										className="h-20 flex flex-col items-center space-y-2"
+										disabled
+									>
+										<BarChart3 className="h-6 w-6" />
+										<span>Xuất dữ liệu</span>
+									</Button>
+								</div>
+							</CardContent>
+						</Card>
+					</div>
+				)
+
+			case "search":
+				return (
+					<div className="space-y-6">
+						<PatientSearch onPatientSelect={handlePatientSelect} />
+					</div>
+				)
+
+			case "details":
+				return (
+					<div className="space-y-6">
+						{selectedPatient && (
+							<PatientDetails
+								patient={selectedPatient}
+								onBack={handleBackToSearch}
+							/>
+						)}
+					</div>
+				)
+
+			default:
+				return null
+		}
 	}
 
 	return (
-		<div className="p-6 space-y-6 w-full">
-			{/* Header */}
-			<PatientsHeader
-				selectedFolder={selectedFolder}
-				isSearchMode={isSearchMode}
-				selectedFolderData={selectedFolderData}
-				patientsTotal={patientsData?.total || 0}
-				patientsCount={patientsData?.patients?.length || 0}
-				onBackClick={() => setSelectedFolder(null)}
-			/>
+		<ErrorBoundary>
+			<div className="container mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
+				{/* Header */}
+				<div className="space-y-4">{renderHeader()}</div>
 
-			{/* Filters and Controls */}
-			<PatientsFilters
-				searchQuery={searchQuery}
-				statusFilter={statusFilter}
-				groupBy={groupBy}
-				sortBy={sortBy}
-				viewMode={viewMode}
-				isSearchMode={isSearchMode}
-				onSearchChange={handleSearchChange}
-				onStatusFilterChange={setStatusFilter}
-				onGroupByChange={handleGroupByChange}
-				onSortByChange={setSortBy}
-				onViewModeChange={setViewMode}
-			/>
-
-			{/* Content */}
-			{isLoading ? (
-				<div className="text-center py-8">
-					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-					<p className="mt-2 text-muted-foreground">
-						Đang tải dữ liệu...
-					</p>
-				</div>
-			) : isSearchMode ? (
-				// Search mode: show patients directly
-				<PatientsTable
-					patients={patientsData?.patients || []}
-					isLoading={isLoading}
-				/>
-			) : selectedFolder ? (
-				// Folder selected: show patients in that folder
-				<PatientsTable
-					patients={selectedFolderData?.patients || []}
-					isLoading={isLoading}
-				/>
-			) : (
-				// Default view: show time folders
-				<TimeFolders
-					folders={timeFolders}
-					onFolderClick={setSelectedFolder}
-				/>
-			)}
-
-			{/* Empty State */}
-			{!isLoading &&
-				((isSearchMode &&
-					(!patientsData?.patients ||
-						patientsData.patients.length === 0)) ||
-					(!isSearchMode &&
-						!selectedFolder &&
-						timeFolders.length === 0) ||
-					(selectedFolder &&
-						(!selectedFolderData?.patients ||
-							selectedFolderData.patients.length === 0))) && (
-					<PatientsEmptyState
-						isSearchMode={isSearchMode}
-						selectedFolder={selectedFolder}
-						selectedFolderLabel={selectedFolderData?.label}
-					/>
-				)}
-		</div>
+				{/* Content */}
+				<div className="space-y-4 sm:space-y-6">{renderContent()}</div>
+			</div>
+		</ErrorBoundary>
 	)
 }

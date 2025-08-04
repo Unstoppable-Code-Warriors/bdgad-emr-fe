@@ -1,7 +1,2 @@
-export { PatientsHeader } from "./patients-header"
-export { PatientsFilters } from "./patients-filters"
-export { PatientsTable } from "./patients-table"
-export { TimeFolders } from "./time-folders"
-export { PatientsEmptyState } from "./patients-empty-state"
 export { AppSidebar } from "./app-sidebar"
 export { AppHeader } from "./app-header"

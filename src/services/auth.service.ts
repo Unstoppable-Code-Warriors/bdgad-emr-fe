@@ -1,8 +1,7 @@
 import type { User } from "@/types/user"
-import type { APIResponse } from "@/utils/api"
-import { authApi, createAuthenticatedApi } from "@/utils/api"
-import { getAccessToken } from "@/stores/auth.store"
-import { LOCALIZATION } from "@/utils/localization"
+import type { ApiResponse } from "@/utils/api"
+import { authApi as api } from "@/utils/authApi"
+import { clearTokensOutside, getAccessToken } from "@/stores/auth.store"
 
 // API response types
 interface LoginResponse {
@@ -20,22 +19,23 @@ interface UserProfileResponse {
 
 interface ForgotPasswordRequest {
 	email: string
-	redirectUrl: string
+}
+
+interface ForgotPasswordResponse {
+	message: string
 }
 
 interface ResetPasswordRequest {
 	token: string
-	newPassword: string
+	password: string
 	confirmPassword: string
 }
 
-interface ChangePasswordRequest {
-	currentPassword: string
-	newPassword: string
+interface ResetPasswordResponse {
+	message: string
 }
 
-// Google OAuth types
-interface GoogleOAuthResponse {
+interface GoogleAuthResponse {
 	data: {
 		oauthUrl: string
 		state: string
@@ -48,7 +48,7 @@ class AuthService {
 	 * Login user with email and password
 	 */
 	async login(credentials: LoginCredentials): Promise<LoginResponse> {
-		const response = await authApi
+		const response = await api
 			.post("auth/login", {
 				json: credentials,
 			})
@@ -58,44 +58,21 @@ class AuthService {
 	}
 
 	/**
-	 * Initiate Google OAuth flow
-	 */
-	async initiateGoogleOAuth(
-		redirectAfterLogin: string
-	): Promise<GoogleOAuthResponse> {
-		const response = await authApi
-			.post("auth/google", {
-				json: { redirectAfterLogin },
-			})
-			.json<GoogleOAuthResponse>()
-
-		return response
-	}
-
-	/**
-	 * Logout current user
-	 */
-	async logout(): Promise<void> {
-		const token = getAccessToken()
-		if (token) {
-			const authenticatedApi = createAuthenticatedApi(token)
-			await authenticatedApi.post("auth/logout")
-		}
-	}
-
-	/**
 	 * Get current user profile
 	 */
-	async getProfile(): Promise<APIResponse<UserProfileResponse>> {
+	async getProfile(): Promise<ApiResponse<UserProfileResponse>> {
 		const token = getAccessToken()
 		if (!token) {
-			throw new Error(LOCALIZATION.ERRORS.UNAUTHORIZED)
+			throw new Error("Token not found")
 		}
 
-		const authenticatedApi = createAuthenticatedApi(token)
-		const response = await authenticatedApi
-			.get("auth/me")
-			.json<APIResponse<UserProfileResponse>>()
+		const response = await api
+			.get("auth/me", {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+			.json<ApiResponse<UserProfileResponse>>()
 
 		return response
 	}
@@ -105,12 +82,12 @@ class AuthService {
 	 */
 	async forgotPassword(
 		data: ForgotPasswordRequest
-	): Promise<{ message: string }> {
-		const response = await authApi
+	): Promise<ForgotPasswordResponse> {
+		const response = await api
 			.post("auth/forgot-password", {
 				json: data,
 			})
-			.json<{ message: string }>()
+			.json<ForgotPasswordResponse>()
 
 		return response
 	}
@@ -120,59 +97,35 @@ class AuthService {
 	 */
 	async resetPassword(
 		data: ResetPasswordRequest
-	): Promise<{ message: string }> {
-		const response = await authApi
+	): Promise<ResetPasswordResponse> {
+		const response = await api
 			.post("auth/reset-password", {
 				json: data,
 			})
-			.json<{ message: string }>()
+			.json<ResetPasswordResponse>()
 
 		return response
 	}
 
 	/**
-	 * Change password (for authenticated users)
+	 * Logout user
 	 */
-	async changePassword(
-		data: ChangePasswordRequest
-	): Promise<{ message: string }> {
-		const token = getAccessToken()
-		if (!token) {
-			throw new Error(LOCALIZATION.ERRORS.UNAUTHORIZED)
+	async logout(): Promise<void> {
+		clearTokensOutside()
+		window.location.href = "/auth/login"
+	}
+
+	/**
+	 * Get Google OAuth URL
+	 */
+	async getGoogleAuthUrl(redirectUrl?: string): Promise<GoogleAuthResponse> {
+		const searchParams = new URLSearchParams()
+		if (redirectUrl) {
+			searchParams.set("redirect_url", redirectUrl)
 		}
-
-		const authenticatedApi = createAuthenticatedApi(token)
-		const response = await authenticatedApi
-			.post("auth/change-password", {
-				json: data,
-			})
-			.json<{ message: string }>()
-
-		return response
-	}
-
-	/**
-	 * Verify email token (for email verification)
-	 */
-	async verifyEmail(token: string): Promise<{ message: string }> {
-		const response = await authApi
-			.post("auth/verify-email", {
-				json: { token },
-			})
-			.json<{ message: string }>()
-
-		return response
-	}
-
-	/**
-	 * Check if email exists in the system
-	 */
-	async checkEmail(email: string): Promise<{ exists: boolean }> {
-		const response = await authApi
-			.post("auth/check-email", {
-				json: { email },
-			})
-			.json<{ exists: boolean }>()
+		const response = await api
+			.get(`auth/google?${searchParams.toString()}`)
+			.json<GoogleAuthResponse>()
 
 		return response
 	}

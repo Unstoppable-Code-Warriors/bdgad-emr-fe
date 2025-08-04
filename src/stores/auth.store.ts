@@ -9,6 +9,7 @@ interface AuthState {
 	tokens: AuthTokens | null
 	isLoading: boolean
 	isAuthenticated: boolean
+	isHydrated: boolean // Add hydration flag
 }
 
 interface AuthActions {
@@ -27,6 +28,7 @@ const useAuthStore = create<AuthStore>()(
 			tokens: null,
 			isLoading: false,
 			isAuthenticated: false,
+			isHydrated: false,
 
 			// Actions
 			setTokens: (tokens: AuthTokens) =>
@@ -58,6 +60,11 @@ const useAuthStore = create<AuthStore>()(
 				tokens: state.tokens,
 				isAuthenticated: state.isAuthenticated,
 			}),
+			onRehydrateStorage: () => (state) => {
+				state?.setLoading?.(false)
+				// Set hydrated flag
+				if (state) state.isHydrated = true
+			},
 		}
 	)
 )
@@ -74,11 +81,17 @@ export const setTokensOutside = (token: string): void => {
 
 export const isUserAuthenticated = (): boolean => {
 	const state = useAuthStore.getState()
-	return state.isAuthenticated && !!state.tokens
+	// Wait for hydration before checking auth
+	if (!state.isHydrated) return false
+	return !!state.tokens?.token // Simplified check
 }
 
 export const clearTokensOutside = (): void => {
 	useAuthStore.getState().clearAuth()
+}
+
+export const isStoreHydrated = (): boolean => {
+	return useAuthStore.getState().isHydrated
 }
 
 export default useAuthStore

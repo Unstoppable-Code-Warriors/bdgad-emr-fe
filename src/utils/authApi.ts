@@ -1,11 +1,11 @@
 import { clearTokensOutside, getAccessToken } from "@/stores/auth.store"
 import ky, { HTTPError } from "ky"
 
-export const BASE_URL = "http://localhost:4000/api/v1"
+export const BASE_AUTH_URL = "https://auth.bdgad.bio/api/v1"
 
 // Create ky instance
-export const api = ky.create({
-	prefixUrl: BASE_URL,
+export const authApi = ky.create({
+	prefixUrl: BASE_AUTH_URL,
 	timeout: 30000,
 	headers: {
 		"Content-Type": "application/json",
@@ -64,16 +64,16 @@ export const apiCall = async <T>(
 
 		switch (method) {
 			case "get":
-				response = await api.get(url, { searchParams })
+				response = await authApi.get(url, { searchParams })
 				break
 			case "post":
-				response = await api.post(url, { json: data, searchParams })
+				response = await authApi.post(url, { json: data, searchParams })
 				break
 			case "put":
-				response = await api.put(url, { json: data, searchParams })
+				response = await authApi.put(url, { json: data, searchParams })
 				break
 			case "delete":
-				response = await api.delete(url, { searchParams })
+				response = await authApi.delete(url, { searchParams })
 				break
 			default:
 				throw new Error(`Unsupported method: ${method}`)
@@ -92,4 +92,4 @@ export const apiCall = async <T>(
 	}
 }
 
-export default api
+export default authApi

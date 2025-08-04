@@ -1,11 +1,16 @@
-import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { queryClient } from "@/utils/query-client"
 import { Toaster } from "@/components/ui/sonner"
 import "./styles/global.css"
+// import "./test-api" // Import test API for logging
+// import "./debug" // Import debug logging
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom"
+
+// console.log("🚀 EMR Frontend Starting...")
+// console.log("Environment:", import.meta.env.MODE)
+
 import ErrorPage from "./apps/404"
 import LoadingScreen from "./components/screen/loading-screen"
 
@@ -29,17 +34,9 @@ const routes = createBrowserRouter([
 		hydrateFallbackElement: <LoadingScreen />,
 		children: [
 			{
-				// Root redirect to dashboard if authenticated, or login if not
+				// Protected routes
 				path: "",
-				loader: () => {
-					// This will be handled by the auth loader logic
-					try {
-						return authLoader()
-					} catch (redirectResponse) {
-						// If auth loader throws redirect, we catch it and handle it
-						throw redirectResponse
-					}
-				},
+				loader: authLoader,
 				element: <MainLayout />,
 				children: [
 					{
@@ -88,3 +85,14 @@ createRoot(document.getElementById("root")!).render(
 	</QueryClientProvider>
 	// </StrictMode>
 )
+
+// Global error handlers commented out to prevent reload issues
+// window.addEventListener("error", (event) => {
+// 	console.error("Global error caught:", event.error)
+// })
+
+// window.addEventListener("unhandledrejection", (event) => {
+// 	console.error("Unhandled promise rejection:", event.reason)
+// })
+
+// console.log("React app initialization complete")

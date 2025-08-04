@@ -13,7 +13,7 @@ export const useGoogleAuth = () => {
 			const callbackUrl = `${window.location.origin}/auth/callback`
 
 			// Call the auth service to get the Google OAuth URL
-			const response = await authService.initiateGoogleOAuth(callbackUrl)
+			const response = await authService.getGoogleAuthUrl(callbackUrl)
 
 			if (response.data?.oauthUrl) {
 				// Redirect to Google OAuth
