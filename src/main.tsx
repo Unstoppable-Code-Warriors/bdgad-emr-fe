@@ -26,6 +26,7 @@ import MainLayout from "./apps/(main)/layout"
 import DashboardPage from "./apps/(main)/dashboard/page"
 import PatientsPage from "./apps/(main)/patients/page"
 import PatientDetailsPage from "./apps/(main)/patients/[id]/page"
+import GeneralFilesPage from "./apps/(main)/general-files/page"
 
 const routes = createBrowserRouter([
 	{
@@ -51,6 +52,10 @@ const routes = createBrowserRouter([
 					{
 						path: "patients/:id",
 						element: <PatientDetailsPage />,
+					},
+					{
+						path: "general-files",
+						element: <GeneralFilesPage />,
 					},
 					{
 						index: true,

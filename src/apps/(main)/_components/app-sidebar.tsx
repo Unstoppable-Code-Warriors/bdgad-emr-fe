@@ -22,6 +22,12 @@ const navigation = [
 		icon: Users,
 		current: false,
 	},
+	{
+		name: "Tệp chung",
+		href: "/general-files",
+		icon: FileText,
+		current: false,
+	},
 	// {
 	// 	name: "Cài đặt",
 	// 	href: "/settings",
