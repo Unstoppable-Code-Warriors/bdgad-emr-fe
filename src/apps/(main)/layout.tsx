@@ -1,18 +1,13 @@
 import { Outlet } from "react-router-dom"
-import { useChatRuntime } from "@assistant-ui/react-ai-sdk"
 import { SidebarProvider } from "@/components/ui/sidebar"
 
 import { AppSidebar, AppHeader } from "./_components"
-import { AssistantRuntimeProvider } from "@assistant-ui/react"
 import { AssistantSidebar } from "@/components/assistant-ui/assistant-sidebar"
+import { AIRuntimeProvider } from "@/components/assistant-ui/ai-runtime-provider"
 
 export default function MainLayout() {
-	const runtime = useChatRuntime({
-		api: "/api/chat",
-	})
-
 	return (
-		<AssistantRuntimeProvider runtime={runtime}>
+		<AIRuntimeProvider>
 			<SidebarProvider>
 				<AssistantSidebar>
 					<div className="min-h-screen w-full flex">
@@ -29,6 +24,6 @@ export default function MainLayout() {
 					</div>
 				</AssistantSidebar>
 			</SidebarProvider>
-		</AssistantRuntimeProvider>
+		</AIRuntimeProvider>
 	)
 }

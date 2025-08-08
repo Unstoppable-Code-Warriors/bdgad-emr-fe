@@ -11,9 +11,12 @@ import useChatbotStore from "@/stores/chatbot.store"
 export const AssistantSidebar: FC<PropsWithChildren> = ({ children }) => {
 	const { isChatbotOpen } = useChatbotStore()
 	return (
-		<ResizablePanelGroup direction="horizontal">
+		<ResizablePanelGroup
+			direction="horizontal"
+			className="h-full max-h-screen"
+		>
 			<ResizablePanel>{children}</ResizablePanel>
-			<ResizableHandle />
+			<ResizableHandle hidden={!isChatbotOpen} />
 			<ResizablePanel
 				defaultSize={40}
 				maxSize={50}
