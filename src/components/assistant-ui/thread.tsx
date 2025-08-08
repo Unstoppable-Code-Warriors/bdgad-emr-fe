@@ -17,6 +17,7 @@ import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	Square,
+	BriefcaseMedical,
 } from "lucide-react"
 
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button"
@@ -36,7 +37,7 @@ export const Thread: FC = () => {
 				["--thread-padding-x" as string]: "1rem",
 			}}
 		>
-			<ThreadPrimitive.Viewport className="relative flex min-w-0 flex-1 flex-col gap-6 overflow-y-scroll">
+			<ThreadPrimitive.Viewport className="relative flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto">
 				<ThreadWelcome />
 
 				<ThreadPrimitive.Messages
@@ -246,7 +247,7 @@ const AssistantMessage: FC = () => {
 				data-role="assistant"
 			>
 				<div className="ring-border bg-background col-start-1 row-start-1 flex size-8 shrink-0 items-center justify-center rounded-full ring-1">
-					<StarIcon size={14} />
+					<BriefcaseMedical size={14} />
 				</div>
 
 				<div className="text-foreground col-span-2 col-start-2 row-start-1 ml-4 leading-7 break-words">
@@ -393,18 +394,3 @@ const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({
 		</BranchPickerPrimitive.Root>
 	)
 }
-
-const StarIcon = ({ size = 14 }: { size?: number }) => (
-	<svg
-		width={size}
-		height={size}
-		viewBox="0 0 16 16"
-		fill="none"
-		xmlns="http://www.w3.org/2000/svg"
-	>
-		<path
-			d="M8 0L9.79611 6.20389L16 8L9.79611 9.79611L8 16L6.20389 9.79611L0 8L6.20389 6.20389L8 0Z"
-			fill="currentColor"
-		/>
-	</svg>
-)

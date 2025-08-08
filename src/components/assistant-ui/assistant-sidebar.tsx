@@ -23,6 +23,7 @@ export const AssistantSidebar: FC<PropsWithChildren> = ({ children }) => {
 				minSize={30}
 				hidden={!isChatbotOpen}
 			>
+				{/* <ThreadList /> */}
 				<Thread />
 			</ResizablePanel>
 		</ResizablePanelGroup>
