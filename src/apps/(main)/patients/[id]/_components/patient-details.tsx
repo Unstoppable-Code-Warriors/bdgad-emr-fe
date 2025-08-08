@@ -12,14 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-	User,
-	MapPin,
-	Calendar,
-	TestTube,
-	FileText,
-	ArrowLeft,
-} from "lucide-react"
+import { User, Calendar, TestTube, FileText, ArrowLeft } from "lucide-react"
 import { usePatientDetails, usePatientTestHistory } from "@/hooks/use-patients"
 import type { PatientSummary } from "@/types/patient"
 import { cn } from "@/lib/utils"
@@ -229,20 +222,6 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 									</div>
 								</div>
 							</div>
-
-							{patient.address && (
-								<div className="flex items-start gap-2">
-									<MapPin className="h-4 w-4 text-muted-foreground mt-1" />
-									<div>
-										<p className="text-sm font-medium">
-											Địa chỉ
-										</p>
-										<p className="text-sm text-muted-foreground">
-											{patient.address}
-										</p>
-									</div>
-								</div>
-							)}
 						</div>
 					</div>
 				</CardContent>

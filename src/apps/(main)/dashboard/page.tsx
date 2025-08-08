@@ -13,7 +13,7 @@ import { LayoutDashboard, Users, BarChart3 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 // Import dashboard component
-import { DashboardStats } from "@/components/dashboard/dashboard-stats"
+import { DashboardStats } from "@/apps/(main)/dashboard/_components/dashboard-stats"
 import { ErrorBoundary } from "@/components/ui/error-boundary"
 
 export default function DashboardPage() {

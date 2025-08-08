@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom"
-import { PatientDetails } from "@/components/patients/patient-details"
+import { PatientDetails } from "@/apps/(main)/patients/[id]/_components/patient-details"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { ErrorBoundary } from "@/components/ui/error-boundary"
 import { EmptyState } from "@/components/ui/empty-state"

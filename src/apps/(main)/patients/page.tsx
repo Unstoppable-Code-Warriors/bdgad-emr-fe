@@ -1,4 +1,4 @@
-import { PatientSearch } from "@/components/patients/patient-search"
+import { PatientSearch } from "@/apps/(main)/patients/_components/patient-search"
 import { ErrorBoundary } from "@/components/ui/error-boundary"
 
 export default function PatientsPage() {
