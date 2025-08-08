@@ -24,7 +24,7 @@ export function AppHeader() {
 	const navigate = useNavigate()
 	const { clearAuth } = useAuthStore()
 	const { data: user, isLoading } = useUserProfile()
-	const { toggle } = useChatbotStore()
+	const { isChatbotOpen, setOpen } = useChatbotStore()
 
 	const handleLogout = () => {
 		clearAuth()
@@ -102,19 +102,21 @@ export function AppHeader() {
 						</DropdownMenuContent>
 					</DropdownMenu>
 
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant="secondary"
-								size="icon"
-								className="size-8 cursor-pointer"
-								onClick={toggle}
-							>
-								<MessageCircle />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent>Chatbot</TooltipContent>
-					</Tooltip>
+					{isChatbotOpen ? null : (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									variant="secondary"
+									size="icon"
+									className="size-8 cursor-pointer"
+									onClick={() => setOpen(true)}
+								>
+									<MessageCircle />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>Chatbot</TooltipContent>
+						</Tooltip>
+					)}
 				</div>
 			</div>
 		</header>

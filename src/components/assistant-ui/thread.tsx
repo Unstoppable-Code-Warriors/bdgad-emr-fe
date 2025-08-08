@@ -18,7 +18,7 @@ import {
 	ChevronRightIcon,
 	Square,
 	BriefcaseMedical,
-	Plus,
+	PanelRightClose,
 } from "lucide-react"
 
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button"
@@ -29,9 +29,12 @@ import { MarkdownText } from "./markdown-text"
 import { ToolFallback } from "./tool-fallback"
 import { useUserProfile } from "@/hooks/useUserQuery"
 import { useNavigate } from "react-router-dom"
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
+import useChatbotStore from "@/stores/chatbot.store"
 
 export const Thread: FC = () => {
 	const navigate = useNavigate()
+	const { setOpen } = useChatbotStore()
 	return (
 		<ThreadPrimitive.Root
 			className="bg-background flex grow flex-col max-h-full"
@@ -40,10 +43,24 @@ export const Thread: FC = () => {
 				["--thread-padding-x" as string]: "1rem",
 			}}
 		>
-			<div className="py-1 px-2">
-				<Button size="sm" variant="outline" onClick={() => navigate(0)}>
-					Đoạn chat mới
-				</Button>
+			<div className="py-4 px-6 w-full border-b border-gray-200">
+				<div className="size-full flex items-center justify-between">
+					<Button variant="outline" onClick={() => navigate(0)}>
+						Đoạn chat mới
+					</Button>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								size="icon"
+								onClick={() => setOpen(false)}
+							>
+								<PanelRightClose />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>Đóng AI Assistant</TooltipContent>
+					</Tooltip>
+				</div>
 			</div>
 			<ThreadPrimitive.Viewport className="relative flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto">
 				<ThreadWelcome />
