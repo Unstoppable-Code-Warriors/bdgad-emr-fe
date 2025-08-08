@@ -18,6 +18,7 @@ import {
 	ChevronRightIcon,
 	Square,
 	BriefcaseMedical,
+	Plus,
 } from "lucide-react"
 
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button"
@@ -27,16 +28,23 @@ import { cn } from "@/lib/utils"
 import { MarkdownText } from "./markdown-text"
 import { ToolFallback } from "./tool-fallback"
 import { useUserProfile } from "@/hooks/useUserQuery"
+import { useNavigate } from "react-router-dom"
 
 export const Thread: FC = () => {
+	const navigate = useNavigate()
 	return (
 		<ThreadPrimitive.Root
-			className="bg-background flex h-full flex-col"
+			className="bg-background flex grow flex-col max-h-full"
 			style={{
 				["--thread-max-width" as string]: "48rem",
 				["--thread-padding-x" as string]: "1rem",
 			}}
 		>
+			<div className="py-1 px-2">
+				<Button size="sm" variant="outline" onClick={() => navigate(0)}>
+					Đoạn chat mới
+				</Button>
+			</div>
 			<ThreadPrimitive.Viewport className="relative flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto">
 				<ThreadWelcome />
 

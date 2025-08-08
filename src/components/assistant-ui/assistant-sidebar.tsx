@@ -22,8 +22,8 @@ export const AssistantSidebar: FC<PropsWithChildren> = ({ children }) => {
 				maxSize={50}
 				minSize={30}
 				hidden={!isChatbotOpen}
+				className="flex flex-col"
 			>
-				{/* <ThreadList /> */}
 				<Thread />
 			</ResizablePanel>
 		</ResizablePanelGroup>
