@@ -125,3 +125,9 @@
 		@apply w-full h-full;
 	}
 }
+
+:root,
+html,
+body {
+	height: 100%;
+}

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { Menu, LogOut } from "lucide-react"
+import { Menu, LogOut, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
@@ -13,11 +13,18 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import useAuthStore from "@/stores/auth.store"
 import { useUserProfile } from "@/hooks/useUserQuery"
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip"
+import useChatbotStore from "@/stores/chatbot.store"
 
 export function AppHeader() {
 	const navigate = useNavigate()
 	const { clearAuth } = useAuthStore()
 	const { data: user, isLoading } = useUserProfile()
+	const { toggle } = useChatbotStore()
 
 	const handleLogout = () => {
 		clearAuth()
@@ -94,6 +101,20 @@ export function AppHeader() {
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
+
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="secondary"
+								size="icon"
+								className="size-8 cursor-pointer"
+								onClick={toggle}
+							>
+								<MessageCircle />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>Chatbot</TooltipContent>
+					</Tooltip>
 				</div>
 			</div>
 		</header>
