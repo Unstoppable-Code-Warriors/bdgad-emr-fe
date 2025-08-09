@@ -113,9 +113,9 @@ import { OpenAI } from "openai"
 // }
 
 const openai = new OpenAI({
-	apiKey: import.meta.env.VITE_OPENAI_API_KEY || "sk-proj-1234567890",
+	apiKey: import.meta.env.VITE_OPENAI_API_KEY || "quydzai",
 	dangerouslyAllowBrowser: true, // Use server-side in production
-	baseURL: "https://api.yescale.io/v1",
+	baseURL: "https://ai-emr.bdgad.bio",
 })
 
 const MyModelAdapter: ChatModelAdapter = {
