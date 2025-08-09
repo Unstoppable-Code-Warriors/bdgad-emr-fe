@@ -1,7 +1,7 @@
 import { LOCALIZATION } from "@/utils/localization"
 
 const LoadingScreen = () => (
-	<div className="min-h-screen w-full flex items-center justify-center">
+	<div className="h-full w-full grid place-items-center">
 		<svg
 			aria-hidden="true"
 			className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"

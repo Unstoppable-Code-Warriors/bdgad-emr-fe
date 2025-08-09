@@ -10,10 +10,10 @@ export default function MainLayout() {
 		<AIRuntimeProvider>
 			<SidebarProvider>
 				<AssistantSidebar>
-					<div className="min-h-screen w-full flex">
+					<div className="h-full min-h-0 w-full flex">
 						<AppSidebar />
 
-						<div className="flex-1 flex flex-col min-w-0 w-full">
+						<div className="flex-1 flex flex-col min-w-0 min-h-0 w-full">
 							<AppHeader />
 
 							{/* Main Content */}

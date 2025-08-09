@@ -64,9 +64,23 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 		dateTo: undefined as Date | undefined,
 	})
 
+	const [errors, setErrors] = useState<{ dateRange?: string }>({})
+
 	const { data: patientsData, isLoading, error } = usePatients(searchParams)
 
 	const handleSearch = useCallback(() => {
+		// Simple validation: end date must be on/after start date
+		if (
+			localSearch.dateFrom &&
+			localSearch.dateTo &&
+			localSearch.dateTo < localSearch.dateFrom
+		) {
+			setErrors({
+				dateRange: "Ngày kết thúc không thể trước ngày bắt đầu",
+			})
+			return
+		}
+		setErrors({})
 		setSearchParams((prev) => ({
 			...prev,
 			name: localSearch.name,
@@ -88,6 +102,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 			dateFrom: undefined,
 			dateTo: undefined,
 		})
+		setErrors({})
 		setSearchParams({
 			page: 1,
 			limit: 10,
@@ -156,10 +171,14 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 		date,
 		onSelect,
 		placeholder = "Chọn ngày...",
+		minDate,
+		maxDate,
 	}: {
 		date: Date | undefined
 		onSelect: (date: Date | undefined) => void
 		placeholder?: string
+		minDate?: Date
+		maxDate?: Date
 	}) => {
 		const [open, setOpen] = React.useState(false)
 
@@ -188,8 +207,12 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 						mode="single"
 						selected={date}
 						captionLayout="dropdown"
-						fromYear={1900}
-						toYear={new Date().getFullYear()}
+						startMonth={new Date(1900, 0)}
+						endMonth={new Date(new Date().getFullYear(), 11)}
+						disabled={[
+							...(minDate ? [{ before: minDate }] : []),
+							...(maxDate ? [{ after: maxDate }] : []),
+						]}
 						onSelect={(selectedDate) => {
 							onSelect(selectedDate)
 							setOpen(false)
@@ -206,7 +229,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 			{/* Search Header */}
 			<Card>
 				<CardHeader>
-					<CardTitle className="flex items-center gap-2">
+					<CardTitle className="flex items-center gap-2 ">
 						<Search className="h-5 w-5" />
 						Tìm Kiếm Bệnh Nhân
 					</CardTitle>
@@ -262,11 +285,24 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 							<DatePicker
 								date={localSearch.dateFrom}
 								onSelect={(date) =>
-									setLocalSearch((prev) => ({
-										...prev,
-										dateFrom: date,
-									}))
+									setLocalSearch((prev) => {
+										// If selecting a start date after the current end date, clear the end date
+										const shouldClearEnd =
+											date &&
+											prev.dateTo &&
+											date > prev.dateTo
+										// Clear any date range error after picking a date
+										setErrors({})
+										return {
+											...prev,
+											dateFrom: date,
+											dateTo: shouldClearEnd
+												? undefined
+												: prev.dateTo,
+										}
+									})
 								}
+								maxDate={localSearch.dateTo}
 								placeholder="Chọn ngày bắt đầu..."
 							/>
 						</div>
@@ -277,20 +313,29 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 							</label>
 							<DatePicker
 								date={localSearch.dateTo}
-								onSelect={(date) =>
+								onSelect={(date) => {
 									setLocalSearch((prev) => ({
 										...prev,
 										dateTo: date,
 									}))
-								}
+									setErrors({})
+								}}
+								minDate={localSearch.dateFrom}
 								placeholder="Chọn ngày kết thúc..."
 							/>
 						</div>
 					</div>
 
+					{errors.dateRange && (
+						<p className="text-sm text-red-600 mt-2">
+							{errors.dateRange}
+						</p>
+					)}
+
 					<div className="flex gap-2 mt-4">
 						<Button
 							onClick={handleSearch}
+							disabled={Boolean(errors.dateRange)}
 							className="flex items-center gap-2"
 						>
 							<Search className="h-4 w-4" />
