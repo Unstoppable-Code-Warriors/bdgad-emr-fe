@@ -11,6 +11,7 @@ import {
 	// type unstable_RemoteThreadListAdapter,
 } from "@assistant-ui/react"
 import { OpenAI } from "openai"
+import { getAccessToken } from "@/stores/auth.store"
 // import { db } from "@/utils/db"
 
 // const customDatabaseAdapter: unstable_RemoteThreadListAdapter = {
@@ -113,7 +114,7 @@ import { OpenAI } from "openai"
 // }
 
 const openai = new OpenAI({
-	apiKey: import.meta.env.VITE_OPENAI_API_KEY || "quydzai",
+	apiKey: getAccessToken() ?? "",
 	dangerouslyAllowBrowser: true, // Use server-side in production
 	baseURL: "https://ai-emr.bdgad.bio",
 })
