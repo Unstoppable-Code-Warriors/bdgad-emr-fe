@@ -20,6 +20,7 @@ interface UserProfileResponse {
 
 interface ForgotPasswordRequest {
 	email: string
+	redirectUrl?: string // Optional vì có thể tự động set trong EMR
 }
 
 interface ForgotPasswordResponse {
@@ -28,7 +29,7 @@ interface ForgotPasswordResponse {
 
 interface ResetPasswordRequest {
 	token: string
-	password: string
+	newPassword: string
 	confirmPassword: string
 }
 

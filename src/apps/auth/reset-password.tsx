@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link, useSearchParams } from "react-router-dom"
+import { Link, useSearchParams, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -19,12 +19,12 @@ import {
 	EyeOff,
 	CheckCircle,
 } from "lucide-react"
-// import authService from "@/services/auth.service"
+import { authService } from "@/services/auth.service"
 import { LOCALIZATION } from "@/utils/localization"
 
 const ResetPasswordPage = () => {
 	const [searchParams] = useSearchParams()
-	// const navigate = useNavigate()
+	const navigate = useNavigate()
 	const [formData, setFormData] = useState({
 		newPassword: "",
 		confirmPassword: "",
@@ -119,31 +119,31 @@ const ResetPasswordPage = () => {
 			return
 		}
 
-		// try {
-		// 	const res = await authService.resetPassword({
-		// 		token,
-		// 		newPassword: formData.newPassword,
-		// 		confirmPassword: formData.confirmPassword,
-		// 	})
-		// 	setSuccess(LOCALIZATION.AUTH.RESET_PASSWORD.SUCCESS_MESSAGE)
-		// 	setFormData({ newPassword: "", confirmPassword: "" })
-		// 	console.log(res)
+		try {
+			const res = await authService.resetPassword({
+				token,
+				newPassword: formData.newPassword,
+				confirmPassword: formData.confirmPassword,
+			})
+			setSuccess(LOCALIZATION.AUTH.RESET_PASSWORD.SUCCESS_MESSAGE)
+			setFormData({ newPassword: "", confirmPassword: "" })
+			console.log(res)
 
-		// 	// Redirect to login after 3 seconds
-		// 	setTimeout(() => {
-		// 		navigate("/auth/login")
-		// 	}, 3000)
-		// } catch (err) {
-		// 	console.log(err)
+			// Redirect to login after 3 seconds
+			setTimeout(() => {
+				navigate("/auth/login")
+			}, 3000)
+		} catch (err) {
+			console.log(err)
 
-		// 	const errorMessage =
-		// 		err instanceof Error
-		// 			? err.message
-		// 			: LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.RESET_FAILED
-		// 	setError(errorMessage)
-		// } finally {
-		// 	setIsSubmitting(false)
-		// }
+			const errorMessage =
+				err instanceof Error
+					? err.message
+					: LOCALIZATION.AUTH.RESET_PASSWORD.VALIDATION.RESET_FAILED
+			setError(errorMessage)
+		} finally {
+			setIsSubmitting(false)
+		}
 	}
 
 	if (!token && !error) {

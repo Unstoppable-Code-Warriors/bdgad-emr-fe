@@ -13,6 +13,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Mail, Stethoscope, CheckCircle } from "lucide-react"
 import { LOCALIZATION } from "@/utils/localization"
+import { authService } from "@/services/auth.service"
 
 const ForgotPasswordPage = () => {
 	const [email, setEmail] = useState("")
@@ -38,22 +39,23 @@ const ForgotPasswordPage = () => {
 			return
 		}
 
-		// try {
-		// 	await authService.forgotPassword({
-		// 		email,
-		// 		redirectUrl: window.location.origin + "/auth",
-		// 	})
-		// 	setSuccess(LOCALIZATION.AUTH.FORGOT_PASSWORD.SUCCESS_MESSAGE)
-		// 	setEmail("")
-		// } catch (err) {
-		// 	const errorMessage =
-		// 		err instanceof Error
-		// 			? err.message
-		// 			: LOCALIZATION.AUTH.FORGOT_PASSWORD.VALIDATION.RESET_FAILED
-		// 	setError(errorMessage)
-		// } finally {
-		// 	setIsSubmitting(false)
-		// }
+		try {
+			await authService.forgotPassword({
+				email,
+				redirectUrl: `${window.location.origin}/auth`,
+			})
+			setSuccess(LOCALIZATION.AUTH.FORGOT_PASSWORD.SUCCESS_MESSAGE)
+			setEmail("")
+		} catch (err) {
+			console.error("Forgot password error:", err)
+			const errorMessage =
+				err instanceof Error
+					? err.message
+					: LOCALIZATION.AUTH.FORGOT_PASSWORD.VALIDATION.RESET_FAILED
+			setError(errorMessage)
+		} finally {
+			setIsSubmitting(false)
+		}
 	}
 
 	return (
