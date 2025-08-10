@@ -12,10 +12,20 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { User, Calendar, TestTube, FileText, ArrowLeft } from "lucide-react"
+import {
+	User,
+	Calendar,
+	TestTube,
+	FileText,
+	ArrowLeft,
+	Download,
+} from "lucide-react"
 import { usePatientDetails, usePatientTestHistory } from "@/hooks/use-patients"
 import type { PatientSummary } from "@/types/patient"
 import { cn } from "@/lib/utils"
+import { FileDownloadService } from "@/services/file-download.service"
+import { toast } from "sonner"
+import { useState } from "react"
 
 interface PatientDetailsProps {
 	patient: PatientSummary
@@ -27,6 +37,44 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 		usePatientDetails(patient.patientKey)
 	const { data: testHistory, isLoading: isLoadingHistory } =
 		usePatientTestHistory(patient.patientKey)
+	const [downloadingFiles, setDownloadingFiles] = useState<Set<number>>(
+		new Set()
+	)
+
+	const handleDownloadFile = async (
+		testKey: number,
+		resultEtlUrl: string,
+		testName: string
+	) => {
+		if (downloadingFiles.has(testKey)) return
+
+		setDownloadingFiles((prev) => new Set(prev).add(testKey))
+
+		try {
+			const filename = `${testName.replace(
+				/[^a-zA-Z0-9]/g,
+				"_"
+			)}_${testKey}.pdf`
+			await FileDownloadService.downloadFile(resultEtlUrl, filename, 3600)
+			toast.success("Đang tải file...", {
+				description: `File ${testName} đang được tải xuống.`,
+			})
+		} catch (error) {
+			console.error("Download error:", error)
+			toast.error("Lỗi tải file", {
+				description:
+					error instanceof Error
+						? error.message
+						: "Không thể tải file. Vui lòng thử lại sau.",
+			})
+		} finally {
+			setDownloadingFiles((prev) => {
+				const newSet = new Set(prev)
+				newSet.delete(testKey)
+				return newSet
+			})
+		}
+	}
 
 	const getInitials = (name: string) => {
 		return name
@@ -247,13 +295,35 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 				</div>
 			)}
 
-			{test.status && (
-				<div className="flex justify-end">
-					<Badge className={getTestStatusColor(test.status)}>
-						{getTestStatusLabel(test.status)}
-					</Badge>
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-2">
+					{test.status && (
+						<Badge className={getTestStatusColor(test.status)}>
+							{getTestStatusLabel(test.status)}
+						</Badge>
+					)}
 				</div>
-			)}
+				{test.resultEtlUrl && (
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() =>
+							handleDownloadFile(
+								test.testKey,
+								test.resultEtlUrl,
+								test.testName
+							)
+						}
+						disabled={downloadingFiles.has(test.testKey)}
+						className="flex items-center gap-2"
+					>
+						<Download className="h-4 w-4" />
+						{downloadingFiles.has(test.testKey)
+							? "Đang tải..."
+							: "Tải kết quả"}
+					</Button>
+				)}
+			</div>
 		</div>
 	)
 
