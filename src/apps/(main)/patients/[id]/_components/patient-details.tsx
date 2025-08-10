@@ -93,6 +93,170 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 		}
 	}
 
+	const getLocationBadgeColor = (location: string | null) => {
+		switch (location?.toLowerCase()) {
+			case "pharmacy":
+				return "bg-green-100 text-green-800"
+			case "bdgad":
+				return "bg-blue-100 text-blue-800"
+			default:
+				return "bg-gray-100 text-gray-800"
+		}
+	}
+
+	const getLocationLabel = (location: string | null) => {
+		switch (location?.toLowerCase()) {
+			case "pharmacy":
+				return "Pharmacy"
+			case "bdgad":
+				return "BDGAD"
+			default:
+				return location || "N/A"
+		}
+	}
+
+	// Combine and filter data by location
+	const getAllTestsByLocation = (targetLocation: string) => {
+		const allTests: Array<{
+			testKey: number
+			testName: string
+			testCategory?: string
+			dateReceived: string
+			dateReported?: string
+			diagnosis?: string | null
+			variantName?: string | null
+			clinicalSignificance?: string | null
+			doctorName?: string
+			clinicName?: string
+			status?: string
+			location: string | null
+			type: "recent" | "history"
+		}> = []
+
+		// Add recent tests
+		if (patientDetails?.recentTests) {
+			patientDetails.recentTests
+				.filter(
+					(test) =>
+						test.location?.toLowerCase() ===
+						targetLocation.toLowerCase()
+				)
+				.forEach((test) =>
+					allTests.push({
+						...test,
+						type: "recent",
+					})
+				)
+		}
+
+		// Add test history
+		if (testHistory) {
+			testHistory
+				.filter(
+					(test) =>
+						test.location?.toLowerCase() ===
+						targetLocation.toLowerCase()
+				)
+				.forEach((test) =>
+					allTests.push({
+						...test,
+						type: "history",
+					})
+				)
+		}
+
+		// Remove duplicates based on testKey and sort by date
+		const uniqueTests = allTests.filter(
+			(test, index, arr) =>
+				arr.findIndex((t) => t.testKey === test.testKey) === index
+		)
+
+		return uniqueTests.sort(
+			(a, b) =>
+				new Date(b.dateReceived).getTime() -
+				new Date(a.dateReceived).getTime()
+		)
+	}
+
+	const bdgadTests = getAllTestsByLocation("bdgad")
+	const pharmacyTests = getAllTestsByLocation("pharmacy")
+
+	const renderTestItem = (test: any) => (
+		<div key={test.testKey} className="p-4 border rounded-lg space-y-3">
+			<div className="flex items-start justify-between">
+				<div>
+					<h4 className="font-semibold">{test.testName}</h4>
+					<div className="flex items-center gap-2 mt-1">
+						{test.testCategory && (
+							<Badge variant="outline">{test.testCategory}</Badge>
+						)}
+						<Badge className={getLocationBadgeColor(test.location)}>
+							{getLocationLabel(test.location)}
+						</Badge>
+					</div>
+				</div>
+				<div className="text-right text-sm text-muted-foreground">
+					<p>Ngày: {formatDate(test.dateReceived)}</p>
+					{test.dateReported && (
+						<p>Báo cáo: {formatDate(test.dateReported)}</p>
+					)}
+					{test.doctorName && <p>BS: {test.doctorName}</p>}
+					{test.clinicName && <p>{test.clinicName}</p>}
+				</div>
+			</div>
+
+			{test.diagnosis && (
+				<div>
+					<p className="text-sm font-medium mb-1">Chẩn đoán:</p>
+					<p className="text-sm text-muted-foreground">
+						{test.diagnosis}
+					</p>
+				</div>
+			)}
+
+			{test.variantName && (
+				<div className="grid gap-2 md:grid-cols-2">
+					<div>
+						<p className="text-sm font-medium">Biến thể:</p>
+						<p className="text-sm text-muted-foreground">
+							{test.variantName}
+						</p>
+					</div>
+					{test.clinicalSignificance && (
+						<div>
+							<p className="text-sm font-medium">
+								Ý nghĩa lâm sàng:
+							</p>
+							<Badge
+								variant={
+									test.clinicalSignificance
+										.toLowerCase()
+										.includes("not detected")
+										? "secondary"
+										: test.clinicalSignificance
+												.toLowerCase()
+												.includes("pathogenic")
+										? "destructive"
+										: "default"
+								}
+							>
+								{test.clinicalSignificance}
+							</Badge>
+						</div>
+					)}
+				</div>
+			)}
+
+			{test.status && (
+				<div className="flex justify-end">
+					<Badge className={getTestStatusColor(test.status)}>
+						{getTestStatusLabel(test.status)}
+					</Badge>
+				</div>
+			)}
+		</div>
+	)
+
 	return (
 		<div className="space-y-6">
 			{/* Header */}
@@ -227,23 +391,23 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 				</CardContent>
 			</Card>
 
-			{/* Tabs for Test Results and History */}
-			<Tabs defaultValue="recent" className="w-full">
+			{/* Tabs for Location-based Test Data */}
+			<Tabs defaultValue="bdgad" className="w-full">
 				<TabsList className="grid w-full grid-cols-2">
-					<TabsTrigger value="recent">Kết Quả Gần Đây</TabsTrigger>
-					<TabsTrigger value="history">Lịch Sử XN</TabsTrigger>
+					<TabsTrigger value="bdgad">Lịch sử xét nghiệm</TabsTrigger>
+					<TabsTrigger value="pharmacy">Thông tin y tế</TabsTrigger>
 				</TabsList>
 
-				<TabsContent value="recent" className="space-y-4">
+				<TabsContent value="bdgad" className="space-y-4">
 					<Card>
 						<CardHeader>
-							<CardTitle>Kết Quả Xét Nghiệm Gần Đây</CardTitle>
+							<CardTitle>Lịch sử xét nghiệm</CardTitle>
 							<CardDescription>
-								Kết quả xét nghiệm
+								Lịch sử xét nghiệm từ hệ thống BDGAD
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							{isLoadingDetails ? (
+							{isLoadingDetails || isLoadingHistory ? (
 								<div className="space-y-4">
 									{Array.from({ length: 3 }).map((_, i) => (
 										<div
@@ -256,118 +420,30 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 										</div>
 									))}
 								</div>
-							) : patientDetails?.recentTests &&
-							  patientDetails.recentTests.length > 0 ? (
+							) : bdgadTests && bdgadTests.length > 0 ? (
 								<div className="space-y-4">
-									{patientDetails.recentTests.map((test) => (
-										<div
-											key={test.testKey}
-											className="p-4 border rounded-lg space-y-3"
-										>
-											<div className="flex items-start justify-between">
-												<div>
-													<h4 className="font-semibold">
-														{test.testName}
-													</h4>
-													<Badge
-														variant="outline"
-														className="mt-1"
-													>
-														{test.testCategory}
-													</Badge>
-												</div>
-												<div className="text-right text-sm text-muted-foreground">
-													<p>
-														Nhận mẫu:{" "}
-														{formatDate(
-															test.dateReceived
-														)}
-													</p>
-													{test.dateReported && (
-														<p>
-															Báo cáo:{" "}
-															{formatDate(
-																test.dateReported
-															)}
-														</p>
-													)}
-												</div>
-											</div>
-
-											{test.diagnosis && (
-												<div>
-													<p className="text-sm font-medium mb-1">
-														Chẩn đoán:
-													</p>
-													<p className="text-sm text-muted-foreground">
-														{test.diagnosis}
-													</p>
-												</div>
-											)}
-
-											{test.variantName && (
-												<div className="grid gap-2 md:grid-cols-2">
-													<div>
-														<p className="text-sm font-medium">
-															Biến thể:
-														</p>
-														<p className="text-sm text-muted-foreground">
-															{test.variantName}
-														</p>
-													</div>
-													{test.clinicalSignificance && (
-														<div>
-															<p className="text-sm font-medium">
-																Ý nghĩa lâm
-																sàng:
-															</p>
-															<Badge
-																variant={
-																	test.clinicalSignificance
-																		.toLowerCase()
-																		.includes(
-																			"not detected"
-																		)
-																		? "secondary"
-																		: test.clinicalSignificance
-																				.toLowerCase()
-																				.includes(
-																					"pathogenic"
-																				)
-																		? "destructive"
-																		: "default"
-																}
-															>
-																{
-																	test.clinicalSignificance
-																}
-															</Badge>
-														</div>
-													)}
-												</div>
-											)}
-										</div>
-									))}
+									{bdgadTests.map(renderTestItem)}
 								</div>
 							) : (
 								<p className="text-center text-muted-foreground py-8">
-									Chưa có kết quả xét nghiệm nào.
+									Chưa có dữ liệu xét nghiệm BDGAD nào.
 								</p>
 							)}
 						</CardContent>
 					</Card>
 				</TabsContent>
 
-				<TabsContent value="history" className="space-y-4">
+				<TabsContent value="pharmacy" className="space-y-4">
 					<Card>
 						<CardHeader>
-							<CardTitle>Lịch Sử Xét Nghiệm</CardTitle>
+							<CardTitle>Thông tin y tế</CardTitle>
 							<CardDescription>
-								Toàn bộ lịch sử xét nghiệm của bệnh nhân
+								Thông tin y tế và xét nghiệm từ hệ thống
+								Pharmacy
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							{isLoadingHistory ? (
+							{isLoadingDetails || isLoadingHistory ? (
 								<div className="space-y-4">
 									{Array.from({ length: 5 }).map((_, i) => (
 										<div
@@ -382,47 +458,13 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 										</div>
 									))}
 								</div>
-							) : testHistory && testHistory.length > 0 ? (
+							) : pharmacyTests && pharmacyTests.length > 0 ? (
 								<div className="space-y-4">
-									{testHistory.map((test) => (
-										<div
-											key={test.testKey}
-											className="flex items-center justify-between p-4 border rounded-lg"
-										>
-											<div className="space-y-1">
-												<h4 className="font-medium">
-													{test.testName}
-												</h4>
-												<div className="flex items-center gap-4 text-sm text-muted-foreground">
-													<span>
-														Ngày:{" "}
-														{formatDate(
-															test.dateReceived
-														)}
-													</span>
-													<span>
-														BS: {test.doctorName}
-													</span>
-													<span>
-														{test.clinicName}
-													</span>
-												</div>
-											</div>
-											<Badge
-												className={getTestStatusColor(
-													test.status
-												)}
-											>
-												{getTestStatusLabel(
-													test.status
-												)}
-											</Badge>
-										</div>
-									))}
+									{pharmacyTests.map(renderTestItem)}
 								</div>
 							) : (
 								<p className="text-center text-muted-foreground py-8">
-									Chưa có lịch sử xét nghiệm nào.
+									Chưa có thông tin y tế từ Pharmacy nào.
 								</p>
 							)}
 						</CardContent>
