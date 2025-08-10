@@ -20,7 +20,7 @@ export function CategoryNavigation({
 	onSearchChange,
 }: CategoryNavigationProps) {
 	return (
-		<Card>
+		<Card className="sticky top-4">
 			<CardHeader className="pb-3">
 				<CardTitle className="text-base">Danh mục</CardTitle>
 			</CardHeader>
