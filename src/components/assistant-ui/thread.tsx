@@ -202,6 +202,7 @@ const Composer: FC = () => {
 					rows={1}
 					autoFocus
 					aria-label="Message input"
+					maxLength={1000}
 				/>
 				<ComposerAction />
 			</ComposerPrimitive.Root>
@@ -366,6 +367,10 @@ const EditComposer: FC = () => {
 				<ComposerPrimitive.Input
 					className="text-foreground flex min-h-[60px] w-full resize-none bg-transparent p-4 outline-none"
 					autoFocus
+					maxLength={1000}
+					onBlur={(e) => {
+						e.target.value = e.target.value.trim()
+					}}
 				/>
 
 				<div className="mx-3 mb-3 flex items-center justify-center gap-2 self-end">
