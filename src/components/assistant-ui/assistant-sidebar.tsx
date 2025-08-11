@@ -15,8 +15,8 @@ export const AssistantSidebar: FC<PropsWithChildren> = ({ children }) => {
 			<ResizablePanel className="min-h-0">{children}</ResizablePanel>
 			<ResizableHandle hidden={!isChatbotOpen} />
 			<ResizablePanel
-				defaultSize={40}
-				maxSize={50}
+				defaultSize={20}
+				maxSize={30}
 				minSize={30}
 				hidden={!isChatbotOpen}
 				className="flex flex-col min-h-0"
