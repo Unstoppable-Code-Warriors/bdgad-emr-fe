@@ -2,11 +2,12 @@ import { useQuery } from "@tanstack/react-query"
 import { PatientService } from "@/services/patient.service"
 import type { PatientSearchParams } from "@/types/patient"
 
-export function usePatients(params: PatientSearchParams) {
+export function usePatients(params: PatientSearchParams, enabled?: boolean) {
 	return useQuery({
 		queryKey: ["patients", params],
 		queryFn: () => PatientService.searchPatients(params),
 		staleTime: 1000 * 60 * 5, // 5 minutes
+		enabled: enabled !== false,
 	})
 }
 

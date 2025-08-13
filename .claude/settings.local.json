@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc --noEmit --skipLibCheck)",
+      "Bash(npm run lint)",
+      "Bash(npx tsc --noEmit src/apps/(main)/patients/_components/patient-search.tsx)",
+      "Bash(npm run build)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
