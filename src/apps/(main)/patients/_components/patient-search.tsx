@@ -96,11 +96,14 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 			const monthParam = `${selectedMonth.year}-${selectedMonth.month
 				.toString()
 				.padStart(2, "0")}`
-			return {
+			const params = {
 				...searchParams,
 				month: monthParam,
 			}
+			console.log("Month folder search params:", params)
+			return params
 		}
+		console.log("Manual search params:", searchParams)
 		return searchParams
 	}, [searchParams, selectedMonth, hasActiveSearch])
 
@@ -259,12 +262,21 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 		setSelectedMonth({ year, month })
 		setViewMode("patients")
 		setHasActiveSearch(false)
+		// Reset pagination to page 1 when selecting a new month
+		setSearchParams((prev) => ({ ...prev, page: 1 }))
 	}, [])
 
 	const handleBackToFolders = useCallback(() => {
 		setViewMode("folders")
 		setSelectedMonth(null)
 		setHasActiveSearch(false)
+		// Clear all search parameters when going back to folders
+		setSearchParams({
+			page: 1,
+			limit: 10,
+			sortBy: "lastTestDate",
+			sortOrder: "DESC",
+		})
 	}, [])
 
 	if (error) {
