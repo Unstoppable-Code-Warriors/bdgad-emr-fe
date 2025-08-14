@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label"
 import {
 	Card,
 	CardContent,
-	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card"
@@ -56,7 +55,7 @@ const LoginPage = () => {
 		}
 
 		try {
-			await login(formData)
+			await login(formData)	
 		} catch (err) {
 			const errorMessage =
 				err instanceof Error
@@ -92,9 +91,6 @@ const LoginPage = () => {
 					<CardTitle className="text-2xl font-bold text-gray-900">
 						{LOCALIZATION.AUTH.LOGIN.TITLE}
 					</CardTitle>
-					<CardDescription className="text-gray-600">
-						{LOCALIZATION.AUTH.LOGIN.DESCRIPTION}
-					</CardDescription>
 				</CardHeader>
 
 				<CardContent>

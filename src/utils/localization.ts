@@ -4,7 +4,6 @@ export const LOCALIZATION = {
 	AUTH: {
 		LOGIN: {
 			TITLE: "Đăng nhập vào hệ thống EMR",
-			DESCRIPTION: "Truy cập bảng điều khiển EMR một cách bảo mật",
 			EMAIL_LABEL: "Địa chỉ email",
 			EMAIL_PLACEHOLDER: "email.cua.ban@benhvien.com",
 			PASSWORD_LABEL: "Mật khẩu",
