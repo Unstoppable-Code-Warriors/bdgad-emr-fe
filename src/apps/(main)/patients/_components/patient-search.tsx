@@ -29,6 +29,12 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover"
 import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
 	Search,
 	User,
 	Calendar as CalendarIcon,
@@ -39,6 +45,7 @@ import {
 	ChevronDown,
 	Folder,
 	ArrowLeft,
+	FilterX,
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { usePatients } from "@/hooks/use-patients"
@@ -58,8 +65,11 @@ interface MonthFolder {
 
 export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 	const navigate = useNavigate()
-	const [viewMode, setViewMode] = useState<'folders' | 'patients'>('folders')
-	const [selectedMonth, setSelectedMonth] = useState<{year: number, month: number} | null>(null)
+	const [viewMode, setViewMode] = useState<"folders" | "patients">("folders")
+	const [selectedMonth, setSelectedMonth] = useState<{
+		year: number
+		month: number
+	} | null>(null)
 	const [searchParams, setSearchParams] = useState<PatientSearchParams>({
 		page: 1,
 		limit: 10,
@@ -77,24 +87,28 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 	const [errors, setErrors] = useState<{ dateRange?: string }>({})
 	const [hasActiveSearch, setHasActiveSearch] = useState(false)
 
-	const shouldCallAPI = Boolean(viewMode === 'patients' && (hasActiveSearch || selectedMonth))
+	const shouldCallAPI = Boolean(
+		viewMode === "patients" && (hasActiveSearch || selectedMonth)
+	)
 	const finalSearchParams = useMemo(() => {
 		if (selectedMonth && !hasActiveSearch) {
-			const startDate = new Date(selectedMonth.year, selectedMonth.month - 1, 1)
-			const endDate = new Date(selectedMonth.year, selectedMonth.month, 0)
+			// Use the new month parameter instead of dateFrom/dateTo for folder clicks
+			const monthParam = `${selectedMonth.year}-${selectedMonth.month
+				.toString()
+				.padStart(2, "0")}`
 			return {
 				...searchParams,
-				dateFrom: format(startDate, 'yyyy-MM-dd'),
-				dateTo: format(endDate, 'yyyy-MM-dd')
+				month: monthParam,
 			}
 		}
 		return searchParams
 	}, [searchParams, selectedMonth, hasActiveSearch])
 
-	const { data: patientsData, isLoading, error } = usePatients(
-		finalSearchParams,
-		shouldCallAPI
-	)
+	const {
+		data: patientsData,
+		isLoading,
+		error,
+	} = usePatients(finalSearchParams, shouldCallAPI)
 
 	const handleSearch = useCallback(() => {
 		// Simple validation: end date must be on/after start date
@@ -110,7 +124,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 		}
 		setErrors({})
 		setHasActiveSearch(true)
-		setViewMode('patients')
+		setViewMode("patients")
+		setSelectedMonth(null) // Clear month selection when doing manual search
 		setSearchParams((prev) => ({
 			...prev,
 			name: localSearch.name,
@@ -121,6 +136,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 			dateTo: localSearch.dateTo
 				? format(localSearch.dateTo, "yyyy-MM-dd")
 				: undefined,
+			month: undefined, // Clear month parameter for manual search
 			page: 1, // Reset to first page when searching
 		}))
 	}, [localSearch])
@@ -135,12 +151,13 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 		setErrors({})
 		setHasActiveSearch(false)
 		setSelectedMonth(null)
-		setViewMode('folders')
+		setViewMode("folders")
 		setSearchParams({
 			page: 1,
 			limit: 10,
 			sortBy: "lastTestDate",
 			sortOrder: "DESC",
+			month: undefined, // Clear month parameter
 		})
 	}, [])
 
@@ -193,22 +210,32 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 		const currentMonth = currentDate.getMonth() + 1
 		const folders: MonthFolder[] = []
 		const monthNames = [
-			'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-			'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+			"Tháng 1",
+			"Tháng 2",
+			"Tháng 3",
+			"Tháng 4",
+			"Tháng 5",
+			"Tháng 6",
+			"Tháng 7",
+			"Tháng 8",
+			"Tháng 9",
+			"Tháng 10",
+			"Tháng 11",
+			"Tháng 12",
 		]
 
 		// Generate last 3 years
 		for (let yearOffset = 0; yearOffset < 3; yearOffset++) {
 			const year = currentYear - yearOffset
 			const maxMonth = year === currentYear ? currentMonth : 12
-			
+
 			// Generate months from 12 down to 1 for each year
 			for (let month = 12; month >= 1; month--) {
 				if (month <= maxMonth) {
 					folders.push({
 						year,
 						month,
-						monthName: monthNames[month - 1]
+						monthName: monthNames[month - 1],
 					})
 				}
 			}
@@ -219,7 +246,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 
 	const groupedFolders = useMemo(() => {
 		const grouped: Record<number, MonthFolder[]> = {}
-		monthFolders.forEach(folder => {
+		monthFolders.forEach((folder) => {
 			if (!grouped[folder.year]) {
 				grouped[folder.year] = []
 			}
@@ -230,12 +257,12 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 
 	const handleMonthClick = useCallback((year: number, month: number) => {
 		setSelectedMonth({ year, month })
-		setViewMode('patients')
+		setViewMode("patients")
 		setHasActiveSearch(false)
 	}, [])
 
 	const handleBackToFolders = useCallback(() => {
-		setViewMode('folders')
+		setViewMode("folders")
 		setSelectedMonth(null)
 		setHasActiveSearch(false)
 	}, [])
@@ -325,8 +352,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-						<div className="space-y-2">
+					<div className="grid gap-4 md:grid-cols-9 lg:grid-cols-11">
+						<div className="space-y-2 col-span-3">
 							<label className="text-sm font-medium">
 								Tên bệnh nhân
 							</label>
@@ -345,7 +372,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 							/>
 						</div>
 
-						<div className="space-y-2">
+						<div className="space-y-2 col-span-3">
 							<label className="text-sm font-medium">
 								Mã Barcode
 							</label>
@@ -364,7 +391,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 							/>
 						</div>
 
-						<div className="space-y-2">
+						<div className="space-y-2 col-span-2">
 							<label className="text-sm font-medium">
 								Từ ngày
 							</label>
@@ -393,7 +420,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 							/>
 						</div>
 
-						<div className="space-y-2">
+						<div className="space-y-2 col-span-2">
 							<label className="text-sm font-medium">
 								Đến ngày
 							</label>
@@ -410,6 +437,41 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 								placeholder="Chọn ngày kết thúc..."
 							/>
 						</div>
+
+						<div className="col-span-1 flex items-end justify-end gap-2">
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											onClick={handleSearch}
+											disabled={Boolean(errors.dateRange)}
+											size="icon"
+										>
+											<Search className="h-4 w-4" />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Tìm kiếm bệnh nhân</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant="outline"
+											onClick={handleClearSearch}
+											size="icon"
+										>
+											<FilterX className="h-4 w-4" />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Xóa bộ lọc</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						</div>
 					</div>
 
 					{errors.dateRange && (
@@ -417,20 +479,6 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 							{errors.dateRange}
 						</p>
 					)}
-
-					<div className="flex gap-2 mt-4">
-						<Button
-							onClick={handleSearch}
-							disabled={Boolean(errors.dateRange)}
-							className="flex items-center gap-2"
-						>
-							<Search className="h-4 w-4" />
-							Tìm kiếm
-						</Button>
-						<Button variant="outline" onClick={handleClearSearch}>
-							Xóa bộ lọc
-						</Button>
-					</div>
 				</CardContent>
 			</Card>
 
@@ -440,31 +488,33 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 					<div className="flex items-center justify-between">
 						<div>
 							<CardTitle className="flex items-center gap-2">
-								{viewMode === 'patients' && (selectedMonth || hasActiveSearch) && (
-									<Button
-										variant="ghost"
-										size="sm"
-										onClick={handleBackToFolders}
-										className="mr-2"
-									>
-										<ArrowLeft className="h-4 w-4" />
-									</Button>
-								)}
-								{viewMode === 'folders' ? 'Thư Mục Tháng' : 
-								selectedMonth && !hasActiveSearch ? 
-								`Bệnh Nhân - ${selectedMonth.month}/${selectedMonth.year}` :
-								'Danh Sách Bệnh Nhân'}
+								{viewMode === "patients" &&
+									(selectedMonth || hasActiveSearch) && (
+										<Button
+											variant="ghost"
+											size="sm"
+											onClick={handleBackToFolders}
+											className="mr-2"
+										>
+											<ArrowLeft className="h-4 w-4" />
+										</Button>
+									)}
+								{viewMode === "folders"
+									? "Thư Mục Tháng"
+									: selectedMonth && !hasActiveSearch
+									? `Bệnh Nhân - ${selectedMonth.month}/${selectedMonth.year}`
+									: "Danh Sách Bệnh Nhân"}
 							</CardTitle>
 							<CardDescription>
-								{viewMode === 'folders' 
-									? 'Chọn tháng để xem danh sách bệnh nhân' 
+								{viewMode === "folders"
+									? "Chọn tháng để xem danh sách bệnh nhân"
 									: patientsData
 									? `Tìm thấy ${patientsData.pagination.total} bệnh nhân`
 									: "Đang tải..."}
 							</CardDescription>
 						</div>
 
-						{viewMode === 'patients' && patientsData && (
+						{viewMode === "patients" && patientsData && (
 							<div className="flex items-center gap-2 text-sm text-muted-foreground">
 								<span>Sắp xếp:</span>
 								<Select
@@ -496,39 +546,50 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 					</div>
 				</CardHeader>
 				<CardContent>
-					{viewMode === 'folders' ? (
+					{viewMode === "folders" ? (
 						<div className="space-y-6">
 							{Object.keys(groupedFolders)
 								.map(Number)
 								.sort((a, b) => b - a)
 								.map((year) => (
-								<div key={year} className="space-y-3">
-									<h3 className="text-lg font-semibold text-foreground">
-										Năm {year}
-									</h3>
-									<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-										{groupedFolders[year].map((folder) => (
-											<Card
-												key={`${folder.year}-${folder.month}`}
-												className="cursor-pointer hover:bg-accent/50 transition-colors"
-												onClick={() => handleMonthClick(folder.year, folder.month)}
-											>
-												<CardContent className="p-4 text-center">
-													<div className="flex flex-col items-center space-y-2">
-														<Folder className="h-8 w-8 text-primary" />
-														<div className="text-sm font-medium">
-															{folder.monthName}
-														</div>
-														<div className="text-xs text-muted-foreground">
-															{folder.year}
-														</div>
-													</div>
-												</CardContent>
-											</Card>
-										))}
+									<div key={year} className="space-y-3">
+										<h3 className="text-lg font-semibold text-foreground">
+											Năm {year}
+										</h3>
+										<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+											{groupedFolders[year].map(
+												(folder) => (
+													<Card
+														key={`${folder.year}-${folder.month}`}
+														className="cursor-pointer hover:bg-accent/50 transition-colors"
+														onClick={() =>
+															handleMonthClick(
+																folder.year,
+																folder.month
+															)
+														}
+													>
+														<CardContent className="p-4 text-center">
+															<div className="flex flex-col items-center space-y-2">
+																<Folder className="h-8 w-8 text-primary" />
+																<div className="text-sm font-medium">
+																	{
+																		folder.monthName
+																	}
+																</div>
+																<div className="text-xs text-muted-foreground">
+																	{
+																		folder.year
+																	}
+																</div>
+															</div>
+														</CardContent>
+													</Card>
+												)
+											)}
+										</div>
 									</div>
-								</div>
-							))}
+								))}
 						</div>
 					) : shouldCallAPI && isLoading ? (
 						<div className="space-y-4">
@@ -546,7 +607,9 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 								</div>
 							))}
 						</div>
-					) : shouldCallAPI && patientsData?.data && patientsData.data.length > 0 ? (
+					) : shouldCallAPI &&
+					  patientsData?.data &&
+					  patientsData.data.length > 0 ? (
 						<div className="space-y-4">
 							{patientsData.data.map((patient) => (
 								<div

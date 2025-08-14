@@ -76,6 +76,7 @@ export interface PatientSearchParams {
 	barcode?: string
 	dateFrom?: string
 	dateTo?: string
+	month?: string // Format: YYYY-MM
 	testType?: string
 	diagnosis?: string
 	page?: number
