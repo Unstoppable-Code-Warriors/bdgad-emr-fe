@@ -94,7 +94,7 @@ const routes = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
 	// <StrictMode>
 	<QueryClientProvider client={queryClient}>
-		<Toaster />
+		<Toaster position="top-right" />
 		<RouterProvider router={routes} />
 		<ReactQueryDevtools initialIsOpen={false} />
 	</QueryClientProvider>
