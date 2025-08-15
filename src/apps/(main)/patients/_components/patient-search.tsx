@@ -548,9 +548,6 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 										<SelectItem value="name">
 											Tên
 										</SelectItem>
-										<SelectItem value="dateOfBirth">
-											Ngày sinh
-										</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>
