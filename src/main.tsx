@@ -27,6 +27,7 @@ import DashboardPage from "./apps/(main)/dashboard/page"
 import PatientsPage from "./apps/(main)/patients/page"
 import PatientDetailsPage from "./apps/(main)/patients/[id]/page"
 import GeneralFilesPage from "./apps/(main)/general-files/page"
+import HomePage from "./apps/(main)/page"
 
 const routes = createBrowserRouter([
 	{
@@ -59,7 +60,7 @@ const routes = createBrowserRouter([
 					},
 					{
 						index: true,
-						element: <DashboardPage />, // Redirect root to dashboard
+						element: <HomePage />, // Redirect root to dashboard
 					},
 				],
 			},
