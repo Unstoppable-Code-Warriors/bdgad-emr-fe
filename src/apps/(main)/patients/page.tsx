@@ -10,10 +10,10 @@ export default function PatientsPage() {
 					<div className="flex items-center justify-between">
 						<div className="space-y-1">
 							<h2 className="text-2xl font-semibold tracking-tight">
-								Quản lý bệnh nhân
+								Thông tin bệnh nhân
 							</h2>
 							<p className="text-sm text-muted-foreground">
-								Tìm kiếm và quản lý thông tin bệnh nhân
+								Tìm kiếm thông tin bệnh nhân
 							</p>
 						</div>
 					</div>

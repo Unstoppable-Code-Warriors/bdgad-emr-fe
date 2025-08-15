@@ -41,7 +41,7 @@ export default function DashboardPage() {
 								className="flex items-center space-x-2"
 							>
 								<Users className="h-4 w-4" />
-								<span>Quản lý bệnh nhân</span>
+								<span>Thông tin bệnh nhân</span>
 							</Button>
 						</div>
 					</div>
