@@ -14,6 +14,90 @@ export interface PatientDetails extends PatientSummary {
 	patientSourceId: string
 	recentTests: TestResult[]
 	testHistory: TestHistoryItem[]
+	extendedInfo?: ExtendedInfo
+}
+
+export interface ExtendedInfo {
+	pattern: string
+	data: {
+		appointment: {
+			id: string
+			date: string
+		}
+		patient: {
+			fullname: string
+			ethnicity: string
+			marital_status: string
+			address1: string
+			address2: string
+			phone: string
+			gender: string
+			nation: string
+			work_address: string
+			allergies: string
+			personal_history: string
+			family_history: string
+			citizen_id: string
+			date_of_birth: string
+		}
+		medical_record: {
+			start_at: string
+			reason: string
+			current_status: string
+			treatment: string
+			diagnoses: string
+			lab_test: LabTest[]
+			prescription: {
+				issuedDate: string
+				notes: string
+				medications: Medication[]
+			}
+			doctor: {
+				id: number
+				email: string
+				name: string
+				phone: string
+				address: string
+			}
+			s3_file_attachment_urls: string[]
+		}
+	}
+}
+
+export interface LabTest {
+	test_type: string
+	test_name: string
+	machine: string
+	taken_by: {
+		id: number
+		name: string
+	}
+	notes: string
+	conclusion: string
+	results: LabResult[]
+	file_attachments?: FileAttachment[]
+}
+
+export interface LabResult {
+	name: string
+	value: string
+	units: string
+	reference_range: string
+}
+
+export interface Medication {
+	name: string
+	dosage: string
+	route: string
+	frequency: string
+	duration: string
+	instruction: string
+	quantity: number
+}
+
+export interface FileAttachment {
+	filename: string
+	file_size: number
 }
 
 export interface TestResult {

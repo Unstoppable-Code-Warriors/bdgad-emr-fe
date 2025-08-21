@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils"
 import { FileDownloadService } from "@/services/file-download.service"
 import { toast } from "sonner"
 import { useState } from "react"
+import { MedicalInfo } from "./medical-info"
 
 interface PatientDetailsProps {
 	patient: PatientSummary
@@ -40,6 +41,8 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 	const [downloadingFiles, setDownloadingFiles] = useState<Set<number>>(
 		new Set()
 	)
+	const [showMedicalInfo, setShowMedicalInfo] = useState(false)
+	console.log("patientDetails", patientDetails)
 
 	const handleDownloadFile = async (
 		testKey: number,
@@ -229,6 +232,16 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 	const bdgadTests = getAllTestsByLocation("bdgad")
 	const pharmacyTests = getAllTestsByLocation("pharmacy")
 
+	// Show medical info if available and requested
+	if (showMedicalInfo && patientDetails?.extendedInfo) {
+		return (
+			<MedicalInfo
+				extendedInfo={patientDetails.extendedInfo}
+				onBack={() => setShowMedicalInfo(false)}
+			/>
+		)
+	}
+
 	const renderTestItem = (test: any) => (
 		<div key={test.testKey} className="p-4 border rounded-lg space-y-3">
 			<div className="flex items-start justify-between">
@@ -367,13 +380,27 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 						</Avatar>
 
 						<div className="flex-1 space-y-4">
-							<div>
-								<h2 className="text-xl font-semibold">
-									{patient.fullName}
-								</h2>
-								<p className="text-muted-foreground">
-									ID: {patient.patientKey}
-								</p>
+							<div className="flex items-center justify-between">
+								<div>
+									<h2 className="text-xl font-semibold">
+										{patient.fullName}
+									</h2>
+									<p className="text-muted-foreground">
+										ID: {patient.patientKey}
+									</p>
+								</div>
+								
+								{/* Medical Info Button */}
+								{patientDetails?.extendedInfo && (
+									<Button
+										onClick={() => setShowMedicalInfo(true)}
+										variant="outline"
+										size="sm"
+									>
+										<FileText className="h-4 w-4 mr-2" />
+										Thông tin y tế
+									</Button>
+								)}
 							</div>
 
 							<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
