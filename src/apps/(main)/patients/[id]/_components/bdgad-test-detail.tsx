@@ -229,7 +229,13 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 													<div>
 														<h4 className="font-bold text-gray-800 mb-1">Loại xét nghiệm</h4>
 														<p className="text-sm font-semibold text-gray-800 bg-gray-100 px-3 py-1 rounded-full inline-block">
-															{code.type === "hereditary_cancer" ? "Ung thư di truyền" : code.type}
+															{code.type === "hereditary_cancer" 
+																? "Ung thư di truyền" 
+																: code.type === "prenatal_screening" 
+																? "Tiền sinh không xâm lấn"
+																: code.type === "gene_mutation"
+																? "Đột biến gen"
+																: code.type}
 														</p>
 													</div>
 												</div>
