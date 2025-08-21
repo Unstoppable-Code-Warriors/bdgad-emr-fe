@@ -17,17 +17,20 @@ import {
 	Calendar,
 	FileText,
 	ArrowLeft,
-	Download,
 	MapPin,
 	Heart,
 } from "lucide-react"
-import { usePatientDetails, usePatientTestHistory } from "@/hooks/use-patients"
+import { 
+	usePatientDetails, 
+	useTestResultsByPatientKey,
+	useBdgadTestsByPatientKey 
+} from "@/hooks/use-patients"
 import type { PatientSummary } from "@/types/patient"
 import { cn } from "@/lib/utils"
-import { FileDownloadService } from "@/services/file-download.service"
-import { toast } from "sonner"
 import { useState } from "react"
 import { MedicalInfo } from "./medical-info"
+import { BdgadTestDetail } from "./bdgad-test-detail"
+import { TestResultDetail } from "./test-result-detail"
 
 interface PatientDetailsProps {
 	patient: PatientSummary
@@ -35,50 +38,21 @@ interface PatientDetailsProps {
 }
 
 export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
-	const { data: patientDetails, isLoading: isLoadingDetails } =
-		usePatientDetails(patient.patientKey)
-	const { data: testHistory, isLoading: isLoadingHistory } =
-		usePatientTestHistory(patient.patientKey)
-	const [downloadingFiles, setDownloadingFiles] = useState<Set<number>>(
-		new Set()
-	)
+	const { data: patientDetails } = usePatientDetails(patient.patientKey)
+	
+	// New API hooks
+	const { data: testResults, isLoading: isLoadingTestResults } =
+		useTestResultsByPatientKey(patient.patientKey)
+	const { data: bdgadTestsData, isLoading: isLoadingBdgadTests } =
+		useBdgadTestsByPatientKey(patient.patientKey)
+	
 	const [showMedicalInfo, setShowMedicalInfo] = useState(false)
+	const [selectedBdgadTest, setSelectedBdgadTest] = useState<{ testRunKey: number; testNumber: number } | null>(null)
+	const [selectedTestResult, setSelectedTestResult] = useState<{ testRunKey: number; testNumber: number } | null>(null)
+	
 	console.log("patientDetails", patientDetails)
-
-	const handleDownloadFile = async (
-		testKey: number,
-		resultEtlUrl: string,
-		testName: string
-	) => {
-		if (downloadingFiles.has(testKey)) return
-
-		setDownloadingFiles((prev) => new Set(prev).add(testKey))
-
-		try {
-			const filename = `${testName.replace(
-				/[^a-zA-Z0-9]/g,
-				"_"
-			)}_${testKey}.pdf`
-			await FileDownloadService.downloadFile(resultEtlUrl, filename, 3600)
-			toast.success("Đang tải file...", {
-				description: `File ${testName} đang được tải xuống.`,
-			})
-		} catch (error) {
-			console.error("Download error:", error)
-			toast.error("Lỗi tải file", {
-				description:
-					error instanceof Error
-						? error.message
-						: "Không thể tải file. Vui lòng thử lại sau.",
-			})
-		} finally {
-			setDownloadingFiles((prev) => {
-				const newSet = new Set(prev)
-				newSet.delete(testKey)
-				return newSet
-			})
-		}
-	}
+	console.log("testResults", testResults)
+	console.log("bdgadTestsData", bdgadTestsData)
 
 	const getInitials = (name: string) => {
 		return name
@@ -119,119 +93,9 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 		}
 	}
 
-	const getTestStatusColor = (status: string) => {
-		switch (status.toLowerCase()) {
-			case "completed":
-				return "bg-green-100 text-green-800"
-			case "pending":
-				return "bg-yellow-100 text-yellow-800"
-			case "cancelled":
-				return "bg-red-100 text-red-800"
-			default:
-				return "bg-gray-100 text-gray-800"
-		}
-	}
 
-	const getTestStatusLabel = (status: string) => {
-		switch (status.toLowerCase()) {
-			case "completed":
-				return "Hoàn thành"
-			case "pending":
-				return "Đang xử lý"
-			case "cancelled":
-				return "Đã hủy"
-			default:
-				return status
-		}
-	}
 
-	const getLocationBadgeColor = (location: string | null) => {
-		switch (location?.toLowerCase()) {
-			case "pharmacy":
-				return "bg-green-100 text-green-800"
-			case "bdgad":
-				return "bg-blue-100 text-blue-800"
-			default:
-				return "bg-gray-100 text-gray-800"
-		}
-	}
 
-	const getLocationLabel = (location: string | null) => {
-		switch (location?.toLowerCase()) {
-			case "pharmacy":
-				return "Pharmacy"
-			case "bdgad":
-				return "BDGAD"
-			default:
-				return location || "N/A"
-		}
-	}
-
-	// Combine and filter data by location
-	const getAllTestsByLocation = (targetLocation: string) => {
-		const allTests: Array<{
-			testKey: number
-			testName: string
-			testCategory?: string
-			dateReceived: string
-			dateReported?: string
-			diagnosis?: string | null
-			variantName?: string | null
-			clinicalSignificance?: string | null
-			doctorName?: string
-			clinicName?: string
-			status?: string
-			location: string | null
-			type: "recent" | "history"
-		}> = []
-
-		// Add recent tests
-		if (patientDetails?.recentTests) {
-			patientDetails.recentTests
-				.filter(
-					(test) =>
-						test.location?.toLowerCase() ===
-						targetLocation.toLowerCase()
-				)
-				.forEach((test) =>
-					allTests.push({
-						...test,
-						type: "recent",
-					})
-				)
-		}
-
-		// Add test history
-		if (testHistory) {
-			testHistory
-				.filter(
-					(test) =>
-						test.location?.toLowerCase() ===
-						targetLocation.toLowerCase()
-				)
-				.forEach((test) =>
-					allTests.push({
-						...test,
-						type: "history",
-					})
-				)
-		}
-
-		// Remove duplicates based on testKey and sort by date
-		const uniqueTests = allTests.filter(
-			(test, index, arr) =>
-				arr.findIndex((t) => t.testKey === test.testKey) === index
-		)
-
-		return uniqueTests.sort(
-			(a, b) =>
-				new Date(b.dateReceived).getTime() -
-				new Date(a.dateReceived).getTime()
-		)
-	}
-
-	const bdgadTests = getAllTestsByLocation("bdgad")
-	const pharmacyTests = getAllTestsByLocation("pharmacy")
 
 	// Show medical info if available and requested
 	if (showMedicalInfo && patientDetails?.extendedInfo) {
@@ -243,103 +107,29 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 		)
 	}
 
-	const renderTestItem = (test: any) => (
-		<div key={test.testKey} className="p-4 border rounded-lg space-y-3">
-			<div className="flex items-start justify-between">
-				<div>
-					<h4 className="font-semibold">{test.testName}</h4>
-					<div className="flex items-center gap-2 mt-1">
-						{test.testCategory && (
-							<Badge variant="outline">{test.testCategory}</Badge>
-						)}
-						<Badge className={getLocationBadgeColor(test.location)}>
-							{getLocationLabel(test.location)}
-						</Badge>
-					</div>
-				</div>
-				<div className="text-right text-sm text-muted-foreground">
-					<p>Ngày: {formatDate(test.dateReceived)}</p>
-					{test.dateReported && (
-						<p>Báo cáo: {formatDate(test.dateReported)}</p>
-					)}
-					{test.doctorName && <p>BS: {test.doctorName}</p>}
-					{test.clinicName && <p>{test.clinicName}</p>}
-				</div>
-			</div>
+	// Show BDGAD test detail if selected
+	if (selectedBdgadTest) {
+		return (
+			<BdgadTestDetail
+				testRunKey={selectedBdgadTest.testRunKey}
+				testNumber={selectedBdgadTest.testNumber}
+				onBack={() => setSelectedBdgadTest(null)}
+			/>
+		)
+	}
 
-			{test.diagnosis && (
-				<div>
-					<p className="text-sm font-medium mb-1">Chẩn đoán:</p>
-					<p className="text-sm text-muted-foreground">
-						{test.diagnosis}
-					</p>
-				</div>
-			)}
+	// Show test result detail if selected
+	if (selectedTestResult) {
+		return (
+			<TestResultDetail
+				testRunKey={selectedTestResult.testRunKey}
+				testNumber={selectedTestResult.testNumber}
+				onBack={() => setSelectedTestResult(null)}
+			/>
+		)
+	}
 
-			{test.variantName && (
-				<div className="grid gap-2 md:grid-cols-2">
-					<div>
-						<p className="text-sm font-medium">Biến thể:</p>
-						<p className="text-sm text-muted-foreground">
-							{test.variantName}
-						</p>
-					</div>
-					{test.clinicalSignificance && (
-						<div>
-							<p className="text-sm font-medium">
-								Ý nghĩa lâm sàng:
-							</p>
-							<Badge
-								variant={
-									test.clinicalSignificance
-										.toLowerCase()
-										.includes("not detected")
-										? "secondary"
-										: test.clinicalSignificance
-												.toLowerCase()
-												.includes("pathogenic")
-										? "destructive"
-										: "default"
-								}
-							>
-								{test.clinicalSignificance}
-							</Badge>
-						</div>
-					)}
-				</div>
-			)}
 
-			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-2">
-					{test.status && (
-						<Badge className={getTestStatusColor(test.status)}>
-							{getTestStatusLabel(test.status)}
-						</Badge>
-					)}
-				</div>
-				{test.resultEtlUrl && (
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() =>
-							handleDownloadFile(
-								test.testKey,
-								test.resultEtlUrl,
-								test.testName
-							)
-						}
-						disabled={downloadingFiles.has(test.testKey)}
-						className="flex items-center gap-2"
-					>
-						<Download className="h-4 w-4" />
-						{downloadingFiles.has(test.testKey)
-							? "Đang tải..."
-							: "Tải kết quả"}
-					</Button>
-				)}
-			</div>
-		</div>
-	)
 
 	return (
 		<div className="space-y-6">
@@ -484,23 +274,23 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 				</CardContent>
 			</Card>
 
-			{/* Tabs for Location-based Test Data */}
+			{/* Tabs for Test Data */}
 			<Tabs defaultValue="bdgad" className="w-full">
 				<TabsList className="grid w-full grid-cols-2">
-					<TabsTrigger value="bdgad">Lịch sử xét nghiệm</TabsTrigger>
-					<TabsTrigger value="pharmacy">Thông tin y tế</TabsTrigger>
+					<TabsTrigger value="bdgad">Lịch sử lần khám</TabsTrigger>
+					<TabsTrigger value="pharmacy">Kết quả xét nghiệm</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="bdgad" className="space-y-4">
 					<Card>
 						<CardHeader>
-							<CardTitle>Lịch sử xét nghiệm</CardTitle>
+							<CardTitle>Lịch sử lần khám</CardTitle>
 							<CardDescription>
-								Lịch sử xét nghiệm từ hệ thống BDGAD
+								Lịch sử các lần khám từ hệ thống BDGAD
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							{isLoadingDetails || isLoadingHistory ? (
+							{isLoadingBdgadTests ? (
 								<div className="space-y-4">
 									{Array.from({ length: 3 }).map((_, i) => (
 										<div
@@ -513,13 +303,39 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 										</div>
 									))}
 								</div>
-							) : bdgadTests && bdgadTests.length > 0 ? (
+							) : bdgadTestsData && bdgadTestsData.data.length > 0 ? (
 								<div className="space-y-4">
-									{bdgadTests.map(renderTestItem)}
+									{bdgadTestsData.data
+										.sort((a, b) => parseInt(a.caseId) - parseInt(b.caseId))
+										.map((test, index) => (
+										<div 
+											key={test.testRunKey} 
+											className="p-4 border rounded-lg space-y-3 hover:bg-gray-50 cursor-pointer transition-colors"
+											onClick={() => setSelectedBdgadTest({ 
+												testRunKey: test.testRunKey, 
+												testNumber: index + 1 
+											})}
+										>
+											<div className="flex items-start justify-between">
+												<div>
+													<h4 className="font-semibold">Lần {index + 1}</h4>
+													<div className="flex items-center gap-2 mt-1">
+														<Badge variant="outline">Khám BDGAD</Badge>
+														<Badge className="bg-blue-100 text-blue-800">
+															{test.totalFiles} tệp tin
+														</Badge>
+													</div>
+												</div>
+												<div className="text-right text-sm text-muted-foreground">
+													<p>Ngày: {formatDate(test.date)}</p>
+												</div>
+											</div>
+										</div>
+									))}
 								</div>
 							) : (
 								<p className="text-center text-muted-foreground py-8">
-									Chưa có dữ liệu xét nghiệm BDGAD nào.
+									Chưa có dữ liệu lần khám BDGAD nào.
 								</p>
 							)}
 						</CardContent>
@@ -529,14 +345,13 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 				<TabsContent value="pharmacy" className="space-y-4">
 					<Card>
 						<CardHeader>
-							<CardTitle>Thông tin y tế</CardTitle>
+							<CardTitle>Kết quả xét nghiệm</CardTitle>
 							<CardDescription>
-								Thông tin y tế và xét nghiệm từ hệ thống
-								Pharmacy
+								Kết quả xét nghiệm và báo cáo từ hệ thống
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							{isLoadingDetails || isLoadingHistory ? (
+							{isLoadingTestResults ? (
 								<div className="space-y-4">
 									{Array.from({ length: 5 }).map((_, i) => (
 										<div
@@ -551,13 +366,39 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 										</div>
 									))}
 								</div>
-							) : pharmacyTests && pharmacyTests.length > 0 ? (
+							) : testResults && testResults.data.length > 0 ? (
 								<div className="space-y-4">
-									{pharmacyTests.map(renderTestItem)}
+									{testResults.data
+										.sort((a, b) => a.testRunKey - b.testRunKey)
+										.map((test, index) => (
+										<div 
+											key={test.testRunKey} 
+											className="p-4 border rounded-lg space-y-3 hover:bg-gray-50 cursor-pointer transition-colors"
+											onClick={() => setSelectedTestResult({ 
+												testRunKey: test.testRunKey, 
+												testNumber: index + 1 
+											})}
+										>
+											<div className="flex items-start justify-between">
+												<div>
+													<h4 className="font-semibold">Lần {index + 1}</h4>
+													<div className="flex items-center gap-2 mt-1">
+														<Badge variant="outline">Kết quả xét nghiệm</Badge>
+														<Badge className="bg-green-100 text-green-800">
+															{test.totalFiles} tệp tin
+														</Badge>
+													</div>
+												</div>
+												<div className="text-right text-sm text-muted-foreground">
+													<p>Ngày: {formatDate(test.date)}</p>
+												</div>
+											</div>
+										</div>
+									))}
 								</div>
 							) : (
 								<p className="text-center text-muted-foreground py-8">
-									Chưa có thông tin y tế từ Pharmacy nào.
+									Chưa có kết quả xét nghiệm nào.
 								</p>
 							)}
 						</CardContent>
