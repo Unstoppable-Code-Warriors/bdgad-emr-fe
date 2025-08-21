@@ -35,12 +35,9 @@ const CallbackPage = () => {
 			const errorParam = searchParams.get("error")
 			const message = searchParams.get("message")
 
-			console.log(token)
-
 			if (status === "success" && token) {
 				// First, store the token temporarily
 				setTokens({ token })
-				console.log("token", token)
 
 				try {
 					// Fetch user profile to validate role

@@ -1,151 +1,28 @@
-import { type ReactNode } from "react"
-import {
-	AssistantRuntimeProvider,
-	// RuntimeAdapterProvider,
-	// unstable_useRemoteThreadListRuntime,
-	useLocalRuntime,
-	// useThreadListItem,
-	type ChatModelAdapter,
-	// type ThreadHistoryAdapter,
-	// type ThreadMessage,
-	// type unstable_RemoteThreadListAdapter,
-} from "@assistant-ui/react"
-import { OpenAI } from "openai"
+import { type ReactNode, createContext, useContext } from "react"
+import { AssistantRuntimeProvider } from "@assistant-ui/react"
+import { useChat } from "@ai-sdk/react"
+import { useAISDKRuntime } from "@assistant-ui/react-ai-sdk"
 import { getAccessToken } from "@/stores/auth.store"
-// import { db } from "@/utils/db"
+import { DefaultChatTransport } from "ai"
+import { ExploreDBToolUI } from "./explore-db-tool-ui"
+import { CommonQueryToolUI } from "./common-query-tool-ui"
+import { SearchPatientsToolUI } from "./search-patients-tool-ui"
 
-// const customDatabaseAdapter: unstable_RemoteThreadListAdapter = {
-// 	async list() {
-// 		console.log("📋Database adapter: listing threads")
-// 		try {
-// 			const threads = await db.threads.toArray()
-// 			console.log(threads)
+const AI_API = "https://ai.bdgad.bio"
+// const AI_API = "http://localhost:4000/api/v1/ai-chat"
 
-// 			return {
-// 				threads: threads.map((t) => ({
-// 					status: t.archived ? "archived" : "regular",
-// 					remoteId: t.id,
-// 					title: t.title,
-// 				})),
-// 			}
-// 		} catch (error) {
-// 			console.error("❌ Error listing threads:", error)
-// 			return { threads: [] }
-// 		}
-// 	},
-// 	async initialize(threadId) {
-// 		console.log(
-// 			"🆕 Database adapter: initializing new thread with ID:",
-// 			threadId
-// 		)
-// 		try {
-// 			// Use the provided threadId directly as the primary key
-// 			await db.threads.add({
-// 				id: threadId,
-// 				title: "New Thread",
-// 				archived: false,
-// 				createdAt: new Date(),
-// 				updatedAt: new Date(),
-// 			})
-// 			console.log("✅ Thread created successfully with ID:", threadId)
-// 			return { remoteId: threadId, externalId: threadId }
-// 		} catch (error) {
-// 			console.error("❌ Error creating thread:", error)
-// 			// If the thread already exists, just return its ID
-// 			const existingThread = await db.threads.get(threadId)
-// 			if (existingThread) {
-// 				console.log(
-// 					"♻️ Thread already exists, returning existing ID:",
-// 					threadId
-// 				)
-// 				return { remoteId: threadId, externalId: threadId }
-// 			}
-// 			throw error
-// 		}
-// 	},
-// 	async rename(remoteId, newTitle) {
-// 		console.log(
-// 			"📝 Database adapter: renaming thread",
-// 			remoteId,
-// 			"to",
-// 			newTitle
-// 		)
-// 		await db.threads.update(remoteId, { title: newTitle })
-// 	},
-// 	async archive(remoteId) {
-// 		console.log("📦 Database adapter: archiving thread", remoteId)
-// 		await db.threads.update(remoteId, { archived: true })
-// 	},
-// 	async unarchive(remoteId) {
-// 		console.log("📤 Database adapter: unarchiving thread", remoteId)
-// 		await db.threads.update(remoteId, { archived: false })
-// 	},
-// 	async delete(remoteId) {
-// 		console.log("🗑️ Database adapter: deleting thread", remoteId)
-// 		const messages = await db.messages
-// 			.where("threadId")
-// 			.equals(remoteId)
-// 			.toArray()
-// 		await db.threads.delete(remoteId)
-// 		await db.messages.bulkDelete(messages.map((m) => m.id))
-// 	},
-// 	async generateTitle(remoteId, messages) {
-// 		console.log(
-// 			"🏷️ Database adapter: generating title for thread",
-// 			remoteId
-// 		)
-// 		// generate title from messages
-// 		const title = await openai.chat.completions.create({
-// 			model: "gpt-5-mini",
-// 			messages: messages.map((m) => ({
-// 				role: m.role,
-// 				content: m.content
-// 					.filter((c) => c.type === "text")
-// 					.map((c) => c.text)
-// 					.join("\n"),
-// 			})),
-// 			stream: false,
-// 		})
-// 		await db.threads.update(remoteId, {
-// 			title: title.choices[0].message.content || "New Thread",
-// 		})
-// 		return new ReadableStream()
-// 	},
-// }
+interface ChatContextType {
+	chat: ReturnType<typeof useChat>
+}
 
-const openai = new OpenAI({
-	apiKey: getAccessToken() ?? "",
-	dangerouslyAllowBrowser: true, // Use server-side in production
-	baseURL: "https://ai-emr.bdgad.bio",
-})
+const ChatContext = createContext<ChatContextType | null>(null)
 
-const MyModelAdapter: ChatModelAdapter = {
-	async *run({ messages, abortSignal }) {
-		const stream = await openai.chat.completions.create(
-			{
-				model: "gpt-5-mini",
-				messages: messages.map((m) => ({
-					role: m.role,
-					content: m.content
-						.filter((c) => c.type === "text")
-						.map((c) => c.text)
-						.join("\n"),
-				})),
-				stream: true,
-			},
-			{ signal: abortSignal }
-		)
-
-		let fullText = ""
-		for await (const chunk of stream) {
-			const delta = chunk.choices[0]?.delta
-			if (!delta) continue
-			if (typeof delta.content === "string" && delta.content.length > 0) {
-				fullText += delta.content
-				yield { content: [{ type: "text", text: fullText }] }
-			}
-		}
-	},
+export const useChatContext = () => {
+	const context = useContext(ChatContext)
+	if (!context) {
+		throw new Error("useChatContext must be used within AIRuntimeProvider")
+	}
+	return context
 }
 
 export function AIRuntimeProvider({
@@ -153,73 +30,24 @@ export function AIRuntimeProvider({
 }: Readonly<{
 	children: ReactNode
 }>) {
-	// const runtime = unstable_useRemoteThreadListRuntime({
-	// 	runtimeHook: () => {
-	// 		return useLocalRuntime(MyModelAdapter)
-	// 	},
-	// 	adapter: {
-	// 		...customDatabaseAdapter,
-	// 		unstable_Provider: ({ children }) => {
-	// 			const threadListItem = useThreadListItem()
-	// 			const remoteId = threadListItem.remoteId
-	// 			const history = useMemo<ThreadHistoryAdapter>(
-	// 				() => ({
-	// 					async load() {
-	// 						if (!remoteId) return { messages: [] }
-	// 						const messages = await db.messages
-	// 							.where("threadId")
-	// 							.equals(remoteId)
-	// 							.toArray()
-	// 						console.log(messages)
-
-	// 						return {
-	// 							messages: messages.map((m) => ({
-	// 								parentId: m.threadId,
-	// 								message: {
-	// 									id: m.id,
-	// 									content: m.content,
-	// 									createdAt: new Date(m.createdAt),
-	// 									metadata: {
-	// 										custom: {},
-	// 									},
-	// 									role: m.role,
-	// 								} as ThreadMessage,
-	// 							})),
-	// 						}
-	// 					},
-	// 					async append({ message }) {
-	// 						if (!remoteId) {
-	// 							console.warn("No remote ID found")
-	// 							return
-	// 						}
-
-	// 						await db.messages.add({
-	// 							threadId: remoteId,
-	// 							role: message.role,
-	// 							content: message.content,
-	// 							createdAt: message.createdAt,
-	// 						})
-	// 					},
-	// 				}),
-	// 				[remoteId]
-	// 			)
-
-	// 			const adapters = useMemo(() => ({ history }), [history])
-
-	// 			return (
-	// 				<RuntimeAdapterProvider adapters={adapters}>
-	// 					{children}
-	// 				</RuntimeAdapterProvider>
-	// 			)
-	// 		},
-	// 	},
-	// })
-
-	const runtime = useLocalRuntime(MyModelAdapter)
+	const chat = useChat({
+		transport: new DefaultChatTransport({
+			api: `${AI_API}/doctor`,
+			headers: {
+				Authorization: `Bearer ${getAccessToken()}`,
+			},
+		}),
+	})
+	const runtime = useAISDKRuntime(chat)
 
 	return (
-		<AssistantRuntimeProvider runtime={runtime}>
-			{children}
-		</AssistantRuntimeProvider>
+		<ChatContext.Provider value={{ chat }}>
+			<AssistantRuntimeProvider runtime={runtime}>
+				{children}
+				<ExploreDBToolUI />
+				<CommonQueryToolUI />
+				<SearchPatientsToolUI />
+			</AssistantRuntimeProvider>
+		</ChatContext.Provider>
 	)
 }
