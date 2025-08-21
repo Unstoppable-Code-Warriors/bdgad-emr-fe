@@ -28,12 +28,12 @@ import { cn } from "@/lib/utils"
 import { MarkdownText } from "./markdown-text"
 import { ToolFallback } from "./tool-fallback"
 import { useUserProfile } from "@/hooks/useUserQuery"
-import { useNavigate } from "react-router-dom"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 import useChatbotStore from "@/stores/chatbot.store"
+import { useChatContext } from "./ai-runtime-provider"
 
 export const Thread: FC = () => {
-	const navigate = useNavigate()
+	const { chat } = useChatContext()
 	const { setOpen } = useChatbotStore()
 	return (
 		<ThreadPrimitive.Root
@@ -45,7 +45,13 @@ export const Thread: FC = () => {
 		>
 			<div className="py-4 px-6 w-full border-b border-gray-200">
 				<div className="size-full flex items-center justify-between">
-					<Button variant="outline" onClick={() => navigate(0)}>
+					<Button
+						variant="outline"
+						onClick={() => chat.setMessages([])}
+						disabled={["submitted", "streaming"].includes(
+							chat.status
+						)}
+					>
 						Đoạn chat mới
 					</Button>
 					<Tooltip>
