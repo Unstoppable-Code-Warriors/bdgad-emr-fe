@@ -100,6 +100,56 @@ export interface FileAttachment {
 	file_size: number
 }
 
+// New API response types
+export interface TestResultListResponse {
+	data: TestResultSummaryDto[]
+	total: number
+}
+
+export interface TestResultSummaryDto {
+	testRunKey: number
+	date: string
+	totalFiles: number
+}
+
+export interface TestResultDetailsDto {
+	testRunKey: number
+	date: string
+	ehrUrls: string[]
+	patient: {
+		citizenId: string
+		name: string
+		dateOfBirth?: string
+		gender?: string
+		address?: string
+	}
+}
+
+export interface BdgadTestListResponse {
+	data: BdgadTestSummaryDto[]
+	total: number
+}
+
+export interface BdgadTestSummaryDto {
+	testRunKey: number
+	date: string
+	totalFiles: number
+	caseId: string
+}
+
+export interface BdgadTestDetailsDto {
+	testRunKey: number
+	date: string
+	patient: {
+		citizenId: string
+		name: string
+		dateOfBirth?: string
+		gender?: string
+		address?: string
+	}
+	labCodes: any[]
+}
+
 export interface TestResult {
 	testKey: number
 	testName: string

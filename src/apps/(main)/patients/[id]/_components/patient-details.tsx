@@ -15,10 +15,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
 	User,
 	Calendar,
-	TestTube,
 	FileText,
 	ArrowLeft,
 	Download,
+	MapPin,
+	Heart,
 } from "lucide-react"
 import { usePatientDetails, usePatientTestHistory } from "@/hooks/use-patients"
 import type { PatientSummary } from "@/types/patient"
@@ -411,10 +412,12 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 											Ngày sinh
 										</p>
 										<p className="text-sm text-muted-foreground">
-											{patient.dateOfBirth
+											{patientDetails?.extendedInfo?.data?.patient?.date_of_birth
 												? formatDate(
-														patient.dateOfBirth
+														patientDetails.extendedInfo.data.patient.date_of_birth
 												  )
+												: patient.dateOfBirth
+												? formatDate(patient.dateOfBirth)
 												: "Chưa cập nhật"}
 										</p>
 									</div>
@@ -430,20 +433,10 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 											variant="secondary"
 											className="mt-1"
 										>
-											{getGenderLabel(patient.gender)}
+											{patientDetails?.extendedInfo?.data?.patient?.gender
+												? getGenderLabel(patientDetails.extendedInfo.data.patient.gender)
+												: getGenderLabel(patient.gender)}
 										</Badge>
-									</div>
-								</div>
-
-								<div className="flex items-center gap-2">
-									<TestTube className="h-4 w-4 text-muted-foreground" />
-									<div>
-										<p className="text-sm font-medium">
-											Tổng xét nghiệm
-										</p>
-										<p className="text-sm text-muted-foreground">
-											{patient.totalTests}
-										</p>
 									</div>
 								</div>
 
@@ -451,35 +444,38 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 									<FileText className="h-4 w-4 text-muted-foreground" />
 									<div>
 										<p className="text-sm font-medium">
-											Mã Barcode
+											CCCD
 										</p>
 										<p className="text-sm text-muted-foreground font-mono">
-											{patient.barcode}
+											{patientDetails?.extendedInfo?.data?.patient?.citizen_id || "Chưa cập nhật"}
 										</p>
 									</div>
 								</div>
 
 								<div className="flex items-center gap-2">
-									<Calendar className="h-4 w-4 text-muted-foreground" />
+									<MapPin className="h-4 w-4 text-muted-foreground" />
 									<div>
 										<p className="text-sm font-medium">
-											XN gần nhất
+											Quốc gia / Dân tộc
 										</p>
 										<p className="text-sm text-muted-foreground">
-											{formatDate(patient.lastTestDate)}
+											{patientDetails?.extendedInfo?.data?.patient?.nation || "Chưa cập nhật"} / {patientDetails?.extendedInfo?.data?.patient?.ethnicity || "Chưa cập nhật"}
 										</p>
 									</div>
 								</div>
 
 								<div className="flex items-center gap-2">
-									<User className="h-4 w-4 text-muted-foreground" />
+									<Heart className="h-4 w-4 text-muted-foreground" />
 									<div>
 										<p className="text-sm font-medium">
-											Bác sĩ phụ trách
+											Tình trạng hôn nhân
 										</p>
-										<p className="text-sm text-muted-foreground">
-											{patient.doctorName}
-										</p>
+										<Badge
+											variant="secondary"
+											className="mt-1"
+										>
+											{patientDetails?.extendedInfo?.data?.patient?.marital_status || "Chưa cập nhật"}
+										</Badge>
 									</div>
 								</div>
 							</div>
