@@ -17,7 +17,7 @@ import {
 	Microscope
 } from "lucide-react"
 import { useBdgadTestById } from "@/hooks/use-patients"
-import { FileDownloadService } from "@/services/file-download.service"
+import { getPresignedUrl } from "@/utils/api"
 import { toast } from "sonner"
 import { useState } from "react"
 
@@ -54,17 +54,28 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 		}
 	}
 
-	const handleDownloadFile = async (fileUrl: string, fileName?: string) => {
+	const extractFilenameFromUrl = (url: string): string => {
+		try {
+			const urlObj = new URL(url)
+			const pathname = urlObj.pathname
+			const filename = pathname.split('/').pop() || 'download'
+			return filename
+		} catch {
+			return 'download'
+		}
+	}
+
+	const handleDownloadFile = async (fileUrl: string) => {
 		if (downloadingFiles.has(fileUrl)) return
 
 		setDownloadingFiles(prev => new Set(prev).add(fileUrl))
 
 		try {
-			const filename = fileName || FileDownloadService.extractFilenameFromUrl(fileUrl)
-			await FileDownloadService.downloadFile(fileUrl, filename, 3600)
-			toast.success("Đang tải file...", {
-				description: `File ${filename} đang được tải xuống.`
-			})
+			// Get presigned URL
+			const presignedUrl = await getPresignedUrl(fileUrl)
+			
+			// Open presigned URL in new tab for auto download
+			window.open(presignedUrl, '_blank')
 		} catch (error) {
 			console.error("Download error:", error)
 			toast.error("Lỗi tải file", {
@@ -260,7 +271,7 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 													<Button
 														variant="outline"
 														size="sm"
-														onClick={() => handleDownloadFile(code.file_url, `${code.labcode}_file`)}
+														onClick={() => handleDownloadFile(code.file_url)}
 														disabled={downloadingFiles.has(code.file_url)}
 														className="flex items-center gap-2 bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-700 font-medium"
 													>
@@ -272,12 +283,11 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 													<Button
 														variant="outline"
 														size="sm"
-														onClick={() => handleDownloadFile(code.excelResult, `${code.labcode}_excel.xlsx`)}
-														disabled={downloadingFiles.has(code.excelResult)}
+														onClick={() => window.open(code.excelResult, '_blank')}
 														className="flex items-center gap-2 bg-green-50 border-green-200 hover:bg-green-100 text-green-700 font-medium"
 													>
 														<Download className="h-4 w-4" />
-														{downloadingFiles.has(code.excelResult) ? "Đang tải..." : "Tải Excel"}
+														Tải Excel
 													</Button>
 												)}
 												{code.htmlResult && (
@@ -311,14 +321,14 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 											{/* Action Buttons for file_urls */}
 											{code.file_urls && code.file_urls.length > 0 && (
 												<div className="flex flex-wrap gap-3 pt-3 border-t border-gray-200">
-													{code.file_urls.map((fileUrl: string, fileIndex: number) => {
-														const fileName = FileDownloadService.extractFilenameFromUrl(fileUrl)
-														return (
+																									{code.file_urls.map((fileUrl: string, fileIndex: number) => {
+													const fileName = extractFilenameFromUrl(fileUrl)
+													return (
 															<Button
 																key={fileIndex}
 																variant="outline"
 																size="sm"
-																onClick={() => handleDownloadFile(fileUrl, fileName)}
+																onClick={() => handleDownloadFile(fileUrl)}
 																disabled={downloadingFiles.has(fileUrl)}
 																className="flex items-center gap-2 bg-indigo-50 border-indigo-200 hover:bg-indigo-100 text-indigo-700 font-medium"
 															>

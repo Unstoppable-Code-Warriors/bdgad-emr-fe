@@ -13,8 +13,7 @@ import {
 	MapPin
 } from "lucide-react"
 import { useTestResultById } from "@/hooks/use-patients"
-import { FileDownloadService } from "@/services/file-download.service"
-import { toast } from "sonner"
+import { getPresignedUrl } from "@/utils/api"
 import { useState } from "react"
 
 interface TestResultDetailProps {
@@ -50,22 +49,32 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 		}
 	}
 
-	const handleDownloadFile = async (fileUrl: string, fileName?: string) => {
+	const extractFilenameFromUrl = (url: string): string => {
+		try {
+			const urlObj = new URL(url)
+			const pathname = urlObj.pathname
+			const filename = pathname.split('/').pop() || 'download'
+			return filename
+		} catch {
+			return 'download'
+		}
+	}
+
+	const handleDownloadFile = async (fileUrl: string) => {
 		if (downloadingFiles.has(fileUrl)) return
 
 		setDownloadingFiles(prev => new Set(prev).add(fileUrl))
 
 		try {
-			const filename = fileName || FileDownloadService.extractFilenameFromUrl(fileUrl)
-			await FileDownloadService.downloadFile(fileUrl, filename, 3600)
-			toast.success("Đang tải file...", {
-				description: `File ${filename} đang được tải xuống.`
-			})
+			// Get presigned URL
+			const presignedUrl = await getPresignedUrl(fileUrl)
+			
+			// Open presigned URL in new tab for auto download
+			window.open(presignedUrl, '_blank')
+			
+
 		} catch (error) {
 			console.error("Download error:", error)
-			toast.error("Lỗi tải file", {
-				description: error instanceof Error ? error.message : "Không thể tải file. Vui lòng thử lại sau."
-			})
 		} finally {
 			setDownloadingFiles(prev => {
 				const newSet = new Set(prev)
@@ -225,7 +234,7 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 								</p>
 								<div className="grid gap-3">
 									{testDetail.ehrUrls.map((fileUrl, index) => {
-										const fileName = FileDownloadService.extractFilenameFromUrl(fileUrl)
+										const fileName = extractFilenameFromUrl(fileUrl)
 										const isDownloading = downloadingFiles.has(fileUrl)
 										
 										return (
@@ -244,7 +253,7 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 												<Button
 													variant="outline"
 													size="sm"
-													onClick={() => handleDownloadFile(fileUrl, fileName)}
+													onClick={() => handleDownloadFile(fileUrl)}
 													disabled={isDownloading}
 													className="flex items-center gap-2"
 												>
