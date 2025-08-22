@@ -221,7 +221,7 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 									{/* Lab Code with specific labcode */}
 									{code.labcode ? (
 										<div className="space-y-4">
-											<div className="grid gap-6 md:grid-cols-3">
+											<div className="grid gap-6 md:grid-cols-2">
 												<div className="flex items-start gap-3">
 													<div className="p-2 bg-gray-100 rounded-lg">
 														<TestTube className="h-4 w-4 text-blue-600" />
@@ -250,19 +250,6 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 														</p>
 													</div>
 												</div>
-												{code.commentResult && (
-													<div className="flex items-start gap-3">
-														<div className="p-2 bg-gray-100 rounded-lg">
-															<MessageSquare className="h-4 w-4 text-emerald-600" />
-														</div>
-														<div>
-															<h4 className="font-bold text-gray-800 mb-1">Nhận xét kỹ thuật viên Thẩm định</h4>
-															<p className="text-sm font-medium text-gray-800 bg-gray-100 px-3 py-2 rounded-lg">
-																{code.commentResult}
-															</p>
-														</div>
-													</div>
-												)}
 											</div>
 											
 											{/* Action Buttons */}
@@ -302,6 +289,32 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 													</Button>
 												)}
 											</div>
+
+											{/* Comment section - full width below buttons */}
+											{code.commentResult && (
+												<div className="pt-3 border-t border-gray-200">
+													<div className="flex items-start gap-3">
+														<div className="p-2 bg-gray-100 rounded-lg">
+															<MessageSquare className="h-4 w-4 text-emerald-600" />
+														</div>
+														<div className="flex-1">
+															<h4 className="font-bold text-gray-800 mb-2">Nhận xét kỹ thuật viên Thẩm định</h4>
+															{code.commentResult.length > 200 ? (
+																<textarea 
+																	readOnly 
+																	value={code.commentResult}
+																	className="w-full p-3 text-sm text-gray-800 bg-gray-50 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+																	rows={Math.min(Math.ceil(code.commentResult.length / 80), 6)}
+																/>
+															) : (
+																<p className="text-sm font-medium text-gray-800 bg-gray-50 px-3 py-2 rounded-lg border border-gray-300">
+																	{code.commentResult}
+																</p>
+															)}
+														</div>
+													</div>
+												</div>
+											)}
 										</div>
 									) : (
 										/* General type with multiple file_urls */
