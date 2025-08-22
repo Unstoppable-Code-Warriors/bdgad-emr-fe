@@ -1,7 +1,7 @@
 import { makeAssistantToolUI } from "@assistant-ui/react"
 import { Spinner } from "../ui/shadcn-io/spinner"
 import { CircleX, User, Calendar, MapPin, Hash } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { Card, CardContent } from "../ui/card"
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card"
 import {
 	Tooltip,
