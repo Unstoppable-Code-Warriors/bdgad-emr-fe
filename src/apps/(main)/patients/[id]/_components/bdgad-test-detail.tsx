@@ -285,7 +285,7 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 														className="flex items-center gap-2 bg-orange-50 border-orange-200 hover:bg-orange-100 text-orange-700 font-medium"
 													>
 														<ExternalLink className="h-4 w-4" />
-														Xem báo cáo HTML
+														Xem kết quả ETL
 													</Button>
 												)}
 											</div>
