@@ -320,7 +320,7 @@ export function MedicalInfo({ extendedInfo, onBack }: MedicalInfoProps) {
 					{/* Lab Tests Tab - Compact */}
 					<TabsContent value="lab" className="mt-3 flex-1 overflow-auto">
 						<div className="space-y-3">
-							{medical_record.lab_test.map((test, index) => (
+							{medical_record.lab_test && medical_record.lab_test.length > 0 ? medical_record.lab_test.map((test, index) => (
 								<Card key={index} className="shadow-sm border">
 									<CardHeader className="pb-3">
 										<div className="flex items-center justify-between">
@@ -354,7 +354,7 @@ export function MedicalInfo({ extendedInfo, onBack }: MedicalInfoProps) {
 											<div className="space-y-2">
 												<h4 className="text-xs font-medium text-gray-700">Kết quả chi tiết</h4>
 												<div className="space-y-1.5 max-h-40 overflow-y-auto">
-													{test.results.map((result, resultIndex) => (
+													{test.results && test.results.length > 0 ? test.results.map((result, resultIndex) => (
 														<div key={resultIndex} className="bg-gray-50 rounded p-2">
 															<div className="flex justify-between items-center mb-0.5">
 																<span className="text-xs font-medium text-gray-800">{result.name}</span>
@@ -366,7 +366,11 @@ export function MedicalInfo({ extendedInfo, onBack }: MedicalInfoProps) {
 																Tham chiếu: {result.reference_range}
 															</p>
 														</div>
-													))}
+													)) : (
+														<div className="text-center py-4">
+															<p className="text-xs text-gray-500">Không có kết quả chi tiết</p>
+														</div>
+													)}
 												</div>
 
 												{test.file_attachments && test.file_attachments.length > 0 && (
@@ -394,7 +398,14 @@ export function MedicalInfo({ extendedInfo, onBack }: MedicalInfoProps) {
 										</div>
 									</CardContent>
 								</Card>
-							))}
+							)) : (
+								<div className="text-center py-12">
+									<div className="p-4 bg-gray-100 rounded-full w-fit mx-auto mb-4">
+										<TestTube className="h-12 w-12 text-gray-400" />
+									</div>
+									<p className="text-sm font-medium text-gray-500">Chưa có kết quả xét nghiệm</p>
+								</div>
+							)}
 						</div>
 					</TabsContent>
 
@@ -407,14 +418,16 @@ export function MedicalInfo({ extendedInfo, onBack }: MedicalInfoProps) {
 										<Pill className="h-5 w-5 text-green-600" />
 										Đơn thuốc
 									</CardTitle>
-									<Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-										{formatDateTime(medical_record.prescription.issuedDate)}
-									</Badge>
+									{medical_record.prescription && medical_record.prescription.issuedDate && (
+										<Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+											{formatDateTime(medical_record.prescription.issuedDate)}
+										</Badge>
+									)}
 								</div>
 							</CardHeader>
 							<CardContent className="space-y-4">
 								<div className="space-y-4">
-									{medical_record.prescription.medications.map((med, index) => (
+									{medical_record.prescription && medical_record.prescription.medications && medical_record.prescription.medications.length > 0 ? medical_record.prescription.medications.map((med, index) => (
 										<div key={index} className="border rounded-lg p-4 bg-green-50 border-green-200">
 											<div className="flex items-start justify-between mb-3">
 												<h5 className="text-lg font-semibold text-green-900">{med.name}</h5>
@@ -449,16 +462,23 @@ export function MedicalInfo({ extendedInfo, onBack }: MedicalInfoProps) {
 												</div>
 											)}
 										</div>
-									))}
+									)) : (
+										<div className="text-center py-12">
+											<div className="p-4 bg-gray-100 rounded-full w-fit mx-auto mb-4">
+												<Pill className="h-12 w-12 text-gray-400" />
+											</div>
+											<p className="text-sm font-medium text-gray-500">Chưa có đơn thuốc</p>
+										</div>
+									)}
 								</div>
 
-								{medical_record.prescription.notes && (
+								{medical_record.prescription && medical_record.prescription.notes && (
 									<div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
 										<h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
 											<FileText className="h-4 w-4" />
 											Ghi chú từ bác sĩ
 										</h4>
-										<p className="text-sm text-blue-800 italic">"{medical_record.prescription.notes}"</p>
+										<p className="text-sm text-blue-800 italic">"{medical_record.prescription?.notes}"</p>
 									</div>
 								)}
 							</CardContent>

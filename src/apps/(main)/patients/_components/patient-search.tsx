@@ -380,7 +380,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
               />
             </div>
 
-            <div className="space-y-2 col-span-1">
+            <div className="space-y-2 col-span-1 grow">
               <label className="text-sm font-medium">Từ ngày</label>
               <DatePicker
                 date={localSearch.dateFrom}
