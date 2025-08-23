@@ -571,23 +571,9 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 
                     <div className="space-y-1">
                       <h4 className="font-semibold">{patient.fullName}</h4>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <User className="h-3 w-3" />
-                          {patient.dateOfBirth
-                            ? formatDate(patient.dateOfBirth)
-                            : "N/A"}
-                        </span>
-                        <Badge variant="secondary" className="text-xs">
-                          {getGenderLabel(patient.gender)}
-                        </Badge>
-                        <span className="flex items-center gap-1">
-                          <TestTube className="h-3 w-3" />
-                          {patient.totalTests} XN
-                        </span>
-                      </div>
+
                       <div className="text-xs text-muted-foreground">
-                        Barcode: {patient.barcode}
+                        CCCD: {patient.citizenID || "N/A"}
                       </div>
                     </div>
                   </div>
@@ -621,14 +607,42 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
               ))}
 
               {/* Pagination */}
-              {patientsData.pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between pt-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4">
+                {/* Info and Limit Selector */}
+                <div className="flex items-center gap-4">
                   <div className="text-sm text-muted-foreground">
-                    Trang {patientsData.pagination.page} /{" "}
-                    {patientsData.pagination.totalPages}(
-                    {patientsData.pagination.total} bệnh nhân)
+                    Hiển thị {((patientsData.pagination.page - 1) * patientsData.pagination.limit) + 1} - {Math.min(patientsData.pagination.page * patientsData.pagination.limit, patientsData.pagination.total)} trong tổng số {patientsData.pagination.total} bệnh nhân
                   </div>
                   <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Hiển thị:</span>
+                    <Select
+                      value={searchParams.limit?.toString() || "10"}
+                      onValueChange={(value) =>
+                        setSearchParams((prev) => ({
+                          ...prev,
+                          limit: parseInt(value),
+                          page: 1, // Reset to first page when changing limit
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="w-20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="20">20</SelectItem>
+                        <SelectItem value="30">30</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                        <SelectItem value="100">100</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Page Numbers */}
+                {patientsData.pagination.totalPages > 1 && (
+                  <div className="flex items-center gap-1">
+                    {/* Previous Button */}
                     <Button
                       variant="outline"
                       size="sm"
@@ -638,8 +652,77 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
                       disabled={!patientsData.pagination.hasPrev}
                     >
                       <ChevronLeft className="h-4 w-4" />
-                      Trước
                     </Button>
+
+                    {/* Page Numbers */}
+                    {(() => {
+                      const currentPage = patientsData.pagination.page;
+                      const totalPages = patientsData.pagination.totalPages;
+                      const pages = [];
+
+                      // Always show first page
+                      if (currentPage > 3) {
+                        pages.push(
+                          <Button
+                            key={1}
+                            variant={1 === currentPage ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handlePageChange(1)}
+                          >
+                            1
+                          </Button>
+                        );
+                        if (currentPage > 4) {
+                          pages.push(
+                            <span key="ellipsis1" className="px-2 text-muted-foreground">
+                              ...
+                            </span>
+                          );
+                        }
+                      }
+
+                      // Show pages around current page
+                      const startPage = Math.max(1, currentPage - 2);
+                      const endPage = Math.min(totalPages, currentPage + 2);
+
+                      for (let i = startPage; i <= endPage; i++) {
+                        pages.push(
+                          <Button
+                            key={i}
+                            variant={i === currentPage ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handlePageChange(i)}
+                          >
+                            {i}
+                          </Button>
+                        );
+                      }
+
+                      // Always show last page
+                      if (currentPage < totalPages - 2) {
+                        if (currentPage < totalPages - 3) {
+                          pages.push(
+                            <span key="ellipsis2" className="px-2 text-muted-foreground">
+                              ...
+                            </span>
+                          );
+                        }
+                        pages.push(
+                          <Button
+                            key={totalPages}
+                            variant={totalPages === currentPage ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handlePageChange(totalPages)}
+                          >
+                            {totalPages}
+                          </Button>
+                        );
+                      }
+
+                      return pages;
+                    })()}
+
+                    {/* Next Button */}
                     <Button
                       variant="outline"
                       size="sm"
@@ -648,12 +731,11 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
                       }
                       disabled={!patientsData.pagination.hasNext}
                     >
-                      Sau
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ) : shouldCallAPI ? (
             <EmptyState

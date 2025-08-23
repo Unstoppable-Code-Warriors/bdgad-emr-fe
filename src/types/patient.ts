@@ -4,6 +4,7 @@ export interface PatientSummary {
 	dateOfBirth: string | null
 	gender: string | null
 	barcode: string
+	citizenID?: string
 	address: string | null
 	lastTestDate: string
 	totalTests: number
