@@ -101,93 +101,109 @@ export function MedicalInfo({ extendedInfo, onBack }: MedicalInfoProps) {
 
 	return (
 		<div className="h-screen bg-gray-50 overflow-hidden">
-			<div className="max-w-7xl mx-auto p-4 h-full flex flex-col space-y-4">
-				{/* Simple Header */}
-				<div className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm border flex-shrink-0">
+			<div className="max-w-7xl mx-auto p-3 h-full flex flex-col space-y-3">
+				{/* Compact Header */}
+				<div className="flex items-center justify-between bg-white rounded-lg p-3 shadow-sm border flex-shrink-0">
 					{onBack && (
-						<Button variant="outline" onClick={onBack} className="flex items-center gap-2">
+						<Button variant="outline" size="sm" onClick={onBack} className="flex items-center gap-2">
 							<ArrowLeft className="h-4 w-4" />
 							Quay lại
 						</Button>
 					)}
-					<div className="flex items-center gap-4">
-						<div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-							<User className="h-6 w-6 text-blue-600" />
+					<div className="flex items-center gap-3">
+						<div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+							<User className="h-5 w-5 text-blue-600" />
 						</div>
 						<div>
-							<h1 className="text-2xl font-bold text-gray-900">{patient.fullname}</h1>
-							<p className="text-gray-500">CCCD: {patient.citizen_id}</p>
+							<h1 className="text-xl font-bold text-gray-900">{patient.fullname}</h1>
+							<p className="text-sm text-gray-500">CCCD: {patient.citizen_id}</p>
 						</div>
 					</div>
 					<div className="text-right">
-						<Badge variant="secondary" className="bg-green-100 text-green-800">
+						<Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
 							Hồ sơ y tế
 						</Badge>
 					</div>
 				</div>
 
-				{/* Clean Tabs */}
+				{/* Enhanced Tabs with Active Colors */}
 				<Tabs defaultValue="personal" className="w-full flex-1 flex flex-col overflow-hidden">
 					<TabsList className="grid w-full grid-cols-4 bg-white p-1 rounded-lg shadow-sm border flex-shrink-0">
-						<TabsTrigger value="personal" className="flex items-center gap-2">
+						<TabsTrigger 
+							value="personal" 
+							className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
+						>
 							<User className="h-4 w-4" />
 							<span className="hidden sm:inline">Thông tin cá nhân</span>
 							<span className="sm:hidden">Cá nhân</span>
 						</TabsTrigger>
-						<TabsTrigger value="medical" className="flex items-center gap-2">
+						<TabsTrigger 
+							value="medical" 
+							className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
+						>
 							<Stethoscope className="h-4 w-4" />
 							<span className="hidden sm:inline">Hồ sơ khám bệnh</span>
 							<span className="sm:hidden">Khám bệnh</span>
 						</TabsTrigger>
-						<TabsTrigger value="lab" className="flex items-center gap-2">
+						<TabsTrigger 
+							value="lab" 
+							className="flex items-center gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
+						>
 							<TestTube className="h-4 w-4" />
 							<span className="hidden sm:inline">Kết quả xét nghiệm</span>
 							<span className="sm:hidden">Xét nghiệm</span>
 						</TabsTrigger>
-						<TabsTrigger value="prescription" className="flex items-center gap-2">
+						<TabsTrigger 
+							value="prescription" 
+							className="flex items-center gap-2 data-[state=active]:bg-orange-500 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
+						>
 							<Pill className="h-4 w-4" />
 							<span className="hidden sm:inline">Đơn thuốc</span>
 							<span className="sm:hidden">Thuốc</span>
 						</TabsTrigger>
 					</TabsList>
 
-					{/* Personal Information Tab */}
-					<TabsContent value="personal" className="mt-4 flex-1 overflow-auto">
-						<div className="grid gap-4 lg:grid-cols-2">
-							{/* Patient Information */}
+					{/* Personal Information Tab - Compact */}
+					<TabsContent value="personal" className="mt-3 flex-1 overflow-auto">
+						<div className="grid gap-3 lg:grid-cols-2">
+							{/* Patient Information - Compact */}
 							<Card className="shadow-sm border">
-								<CardHeader>
-									<CardTitle className="flex items-center gap-2 text-lg">
-										<User className="h-5 w-5 text-blue-600" />
+								<CardHeader className="pb-3">
+									<CardTitle className="flex items-center gap-2 text-base">
+										<User className="h-4 w-4 text-blue-600" />
 										Thông tin bệnh nhân
 									</CardTitle>
 								</CardHeader>
-								<CardContent className="space-y-4">
-									{[
-										{ icon: User, label: "Họ và tên", value: patient.fullname },
-										{ icon: User, label: "Giới tính", value: getGenderLabel(patient.gender) },
-										{ icon: Calendar, label: "Ngày sinh", value: formatDate(patient.date_of_birth) },
-										{ icon: Users, label: "Dân tộc", value: patient.ethnicity },
-										{ icon: MapPin, label: "Quốc tịch", value: patient.nation },
-										{ icon: Heart, label: "Tình trạng hôn nhân", value: getMaritalStatusLabel(patient.marital_status) },
-										{ icon: Phone, label: "Số điện thoại", value: patient.phone },
-										{ icon: Briefcase, label: "Nơi làm việc", value: patient.work_address },
-									].map((item, index) => (
-										<div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
-											<div className="flex items-center gap-3">
-												<item.icon className="h-4 w-4 text-gray-500" />
-												<span className="text-sm font-medium text-gray-700">{item.label}</span>
+								<CardContent className="space-y-2">
+									<div className="grid gap-2">
+										{[
+											{ icon: User, label: "Họ và tên", value: patient.fullname },
+											{ icon: User, label: "Giới tính", value: getGenderLabel(patient.gender) },
+											{ icon: Calendar, label: "Ngày sinh", value: formatDate(patient.date_of_birth) },
+											{ icon: Users, label: "Dân tộc", value: patient.ethnicity },
+											{ icon: MapPin, label: "Quốc tịch", value: patient.nation },
+											{ icon: Heart, label: "Tình trạng hôn nhân", value: getMaritalStatusLabel(patient.marital_status) },
+											{ icon: Phone, label: "Số điện thoại", value: patient.phone },
+											{ icon: Briefcase, label: "Nơi làm việc", value: patient.work_address },
+										].map((item, index) => (
+											<div key={index} className="flex items-center justify-between py-1.5 text-sm">
+												<div className="flex items-center gap-2">
+													<item.icon className="h-3.5 w-3.5 text-gray-500" />
+													<span className="font-medium text-gray-700">{item.label}</span>
+												</div>
+												<span className="text-gray-900 font-medium text-right max-w-[60%] truncate" title={item.value}>
+													{item.value}
+												</span>
 											</div>
-											<span className="text-sm text-gray-900 font-medium">{item.value}</span>
-										</div>
-									))}
+										))}
+									</div>
 
-									<div className="pt-4 border-t">
-										<div className="flex items-center gap-3 mb-3">
-											<MapPin className="h-4 w-4 text-gray-500" />
+									<div className="pt-2 border-t border-gray-100">
+										<div className="flex items-center gap-2 mb-2">
+											<MapPin className="h-3.5 w-3.5 text-gray-500" />
 											<span className="text-sm font-medium text-gray-700">Địa chỉ</span>
 										</div>
-										<div className="ml-7 space-y-1">
+										<div className="ml-5 space-y-0.5">
 											<p className="text-sm text-gray-900">{patient.address1}</p>
 											{patient.address2 && (
 												<p className="text-sm text-gray-600">{patient.address2}</p>
@@ -197,38 +213,38 @@ export function MedicalInfo({ extendedInfo, onBack }: MedicalInfoProps) {
 								</CardContent>
 							</Card>
 
-							{/* Medical History */}
+							{/* Medical History - Compact */}
 							<Card className="shadow-sm border">
-								<CardHeader>
-									<CardTitle className="flex items-center gap-2 text-lg">
-										<Heart className="h-5 w-5 text-red-600" />
+								<CardHeader className="pb-3">
+									<CardTitle className="flex items-center gap-2 text-base">
+										<Heart className="h-4 w-4 text-red-600" />
 										Tiền sử bệnh
 									</CardTitle>
 								</CardHeader>
-								<CardContent className="space-y-4">
-									<div className="space-y-4">
-										<div className="p-4 bg-red-50 rounded-lg border border-red-100">
-											<div className="flex items-center gap-2 mb-2">
-												<AlertTriangle className="h-4 w-4 text-red-600" />
-												<span className="text-sm font-medium text-red-900">Dị ứng</span>
+								<CardContent className="space-y-2">
+									<div className="space-y-2">
+										<div className="p-3 bg-red-50 rounded-lg border border-red-100">
+											<div className="flex items-center gap-2 mb-1">
+												<AlertTriangle className="h-3.5 w-3.5 text-red-600" />
+												<span className="text-xs font-medium text-red-900">Dị ứng</span>
 											</div>
-											<p className="text-sm text-red-800">{patient.allergies || "Không có"}</p>
+											<p className="text-xs text-red-800 leading-relaxed">{patient.allergies || "Không có"}</p>
 										</div>
 
-										<div className="p-4 bg-orange-50 rounded-lg border border-orange-100">
-											<div className="flex items-center gap-2 mb-2">
-												<FileText className="h-4 w-4 text-orange-600" />
-												<span className="text-sm font-medium text-orange-900">Tiền sử bệnh cá nhân</span>
+										<div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
+											<div className="flex items-center gap-2 mb-1">
+												<FileText className="h-3.5 w-3.5 text-orange-600" />
+												<span className="text-xs font-medium text-orange-900">Tiền sử bệnh cá nhân</span>
 											</div>
-											<p className="text-sm text-orange-800">{patient.personal_history || "Không có"}</p>
+											<p className="text-xs text-orange-800 leading-relaxed">{patient.personal_history || "Không có"}</p>
 										</div>
 
-										<div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-											<div className="flex items-center gap-2 mb-2">
-												<Users className="h-4 w-4 text-yellow-600" />
-												<span className="text-sm font-medium text-yellow-900">Tiền sử bệnh gia đình</span>
+										<div className="p-3 bg-yellow-50 rounded-lg border border-yellow-100">
+											<div className="flex items-center gap-2 mb-1">
+												<Users className="h-3.5 w-3.5 text-yellow-600" />
+												<span className="text-xs font-medium text-yellow-900">Tiền sử bệnh gia đình</span>
 											</div>
-											<p className="text-sm text-yellow-800">{patient.family_history || "Không có"}</p>
+											<p className="text-xs text-yellow-800 leading-relaxed">{patient.family_history || "Không có"}</p>
 										</div>
 									</div>
 								</CardContent>
@@ -301,48 +317,48 @@ export function MedicalInfo({ extendedInfo, onBack }: MedicalInfoProps) {
 						</Card>
 					</TabsContent>
 
-					{/* Lab Tests Tab */}
-					<TabsContent value="lab" className="mt-4 flex-1 overflow-auto">
-						<div className="space-y-4">
+					{/* Lab Tests Tab - Compact */}
+					<TabsContent value="lab" className="mt-3 flex-1 overflow-auto">
+						<div className="space-y-3">
 							{medical_record.lab_test.map((test, index) => (
 								<Card key={index} className="shadow-sm border">
-									<CardHeader>
+									<CardHeader className="pb-3">
 										<div className="flex items-center justify-between">
-											<CardTitle className="flex items-center gap-2 text-lg">
-												<TestTube className="h-5 w-5 text-purple-600" />
+											<CardTitle className="flex items-center gap-2 text-base">
+												<TestTube className="h-4 w-4 text-purple-600" />
 												{test.test_name}
 											</CardTitle>
-											<Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+											<Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-xs">
 												{test.test_type}
 											</Badge>
 										</div>
-										<CardDescription>
-											Thực hiện bằng {test.machine} • Bởi {test.taken_by.name}
+										<CardDescription className="text-xs">
+											{test.machine} • {test.taken_by.name}
 										</CardDescription>
 									</CardHeader>
-									<CardContent className="space-y-4">
-										<div className="grid gap-4 lg:grid-cols-2">
-											<div className="space-y-4">
-												<div className="flex items-center justify-between py-2 border-b border-gray-100">
-													<span className="text-sm font-medium text-gray-700">Kết luận</span>
-													<Badge variant="secondary" className="bg-green-100 text-green-800">
+									<CardContent className="space-y-3">
+										<div className="grid gap-3 lg:grid-cols-2">
+											<div className="space-y-2">
+												<div className="flex items-center justify-between py-1">
+													<span className="text-xs font-medium text-gray-700">Kết luận</span>
+													<Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
 														{test.conclusion}
 													</Badge>
 												</div>
 												<div>
-													<span className="text-sm font-medium text-gray-700">Kết quả thẩm định</span>
-													<p className="text-sm text-gray-600 mt-1">{test.notes}</p>
+													<span className="text-xs font-medium text-gray-700">Kết quả thẩm định</span>
+													<p className="text-xs text-gray-600 mt-1 leading-relaxed">{test.notes}</p>
 												</div>
 											</div>
 
-											<div className="space-y-4">
-												<h4 className="text-sm font-medium text-gray-700">Kết quả chi tiết</h4>
-												<div className="space-y-2">
+											<div className="space-y-2">
+												<h4 className="text-xs font-medium text-gray-700">Kết quả chi tiết</h4>
+												<div className="space-y-1.5 max-h-40 overflow-y-auto">
 													{test.results.map((result, resultIndex) => (
-														<div key={resultIndex} className="bg-gray-50 rounded-lg p-3">
-															<div className="flex justify-between items-center mb-1">
-																<span className="text-sm font-medium text-gray-800">{result.name}</span>
-																<Badge variant="outline" className="text-xs">
+														<div key={resultIndex} className="bg-gray-50 rounded p-2">
+															<div className="flex justify-between items-center mb-0.5">
+																<span className="text-xs font-medium text-gray-800">{result.name}</span>
+																<Badge variant="outline" className="text-xs px-1.5 py-0.5">
 																	{result.value} {result.units}
 																</Badge>
 															</div>
@@ -355,19 +371,19 @@ export function MedicalInfo({ extendedInfo, onBack }: MedicalInfoProps) {
 
 												{test.file_attachments && test.file_attachments.length > 0 && (
 													<div>
-														<h4 className="text-sm font-medium text-gray-700 mb-2">File đính kèm</h4>
-														<div className="space-y-2">
+														<h4 className="text-xs font-medium text-gray-700 mb-1">File đính kèm</h4>
+														<div className="space-y-1">
 															{test.file_attachments.map((file, fileIndex) => (
-																<div key={fileIndex} className="flex items-center justify-between p-2 bg-blue-50 rounded-lg border border-blue-100">
+																<div key={fileIndex} className="flex items-center justify-between p-2 bg-blue-50 rounded border border-blue-100">
 																	<div className="flex items-center gap-2">
-																		<FileText className="h-4 w-4 text-blue-600" />
+																		<FileText className="h-3 w-3 text-blue-600" />
 																		<div>
-																			<p className="text-sm font-medium text-blue-900">{file.filename}</p>
+																			<p className="text-xs font-medium text-blue-900">{file.filename}</p>
 																			<p className="text-xs text-blue-600">{(file.file_size / 1024).toFixed(1)} KB</p>
 																		</div>
 																	</div>
-																	<Button variant="outline" size="sm">
-																		<Download className="h-4 w-4" />
+																	<Button variant="outline" size="sm" className="h-6 w-6 p-0">
+																		<Download className="h-3 w-3" />
 																	</Button>
 																</div>
 															))}
