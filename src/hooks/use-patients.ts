@@ -75,3 +75,11 @@ export function useBdgadTestById(testRunKey: number) {
 		staleTime: 1000 * 60 * 10, // 10 minutes
 	})
 }
+
+export function useMonthYearStats() {
+	return useQuery({
+		queryKey: ["month-year-stats"],
+		queryFn: () => PatientService.getMonthYearStats(),
+		staleTime: 1000 * 60 * 30, // 30 minutes
+	})
+}

@@ -52,6 +52,7 @@ import { usePatients } from "@/hooks/use-patients";
 import type { PatientSearchParams, PatientSummary } from "@/types/patient";
 import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
+import { MonthYearStats } from "@/components/ui/month-year-stats";
 
 interface PatientSearchProps {
   onPatientSelect?: (patient: PatientSummary) => void;
@@ -91,15 +92,14 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
   );
   const finalSearchParams = useMemo(() => {
     if (selectedMonth && !hasActiveSearch) {
-      // Use the new month parameter instead of dateFrom/dateTo for folder clicks
-      const monthParam = `${selectedMonth.year}-${selectedMonth.month
-        .toString()
-        .padStart(2, "0")}`;
+      // Use the new folderMonth and folderYear parameters for folder clicks
       const params = {
         ...searchParams,
-        month: monthParam,
+        folderMonth: selectedMonth.month,
+        folderYear: selectedMonth.year,
       };
       console.log("Month folder search params:", params);
+      console.log("Selected month object:", selectedMonth);
       return params;
     }
     console.log("Manual search params:", searchParams);
@@ -140,6 +140,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
         ? format(localSearch.dateTo, "yyyy-MM-dd")
         : undefined,
       month: undefined, // Clear month parameter for manual search
+      folderMonth: undefined, // Clear folder parameters for manual search
+      folderYear: undefined,
       page: 1, // Reset to first page when searching
     }));
   }, [localSearch]);
@@ -165,6 +167,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
       dateFrom: undefined,
       dateTo: undefined,
       month: undefined, // Clear month parameter
+      folderMonth: undefined, // Clear folder parameters
+      folderYear: undefined,
     });
   }, []);
 
@@ -263,6 +267,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
   }, [monthFolders]);
 
   const handleMonthClick = useCallback((year: number, month: number) => {
+    console.log("handleMonthClick called with:", { year, month });
     setSelectedMonth({ year, month });
     setViewMode("patients");
     setHasActiveSearch(false);
@@ -280,6 +285,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
       limit: 10,
       sortBy: "lastTestDate",
       sortOrder: "DESC",
+      folderMonth: undefined,
+      folderYear: undefined,
     });
   }, []);
 
@@ -462,38 +469,36 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
       </Card>
 
       {/* Results */}
-      <Card>
+      {viewMode === "folders" ? (
+        <MonthYearStats onMonthClick={handleMonthClick} />
+      ) : (
+        <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                {viewMode === "patients" &&
-                  (selectedMonth || hasActiveSearch) && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleBackToFolders}
-                      className="mr-2"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                  )}
-                {viewMode === "folders"
-                  ? "Thư Mục Tháng"
-                  : selectedMonth && !hasActiveSearch
+                {(selectedMonth || hasActiveSearch) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBackToFolders}
+                    className="mr-2"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                )}
+                {selectedMonth && !hasActiveSearch
                   ? `Bệnh Nhân - ${selectedMonth.month}/${selectedMonth.year}`
                   : "Danh Sách Bệnh Nhân"}
               </CardTitle>
               <CardDescription>
-                {viewMode === "folders"
-                  ? "Chọn tháng để xem danh sách bệnh nhân"
-                  : patientsData
+                {patientsData
                   ? `Tìm thấy ${patientsData.pagination.total} bệnh nhân`
                   : "Đang tải..."}
               </CardDescription>
             </div>
 
-            {viewMode === "patients" && patientsData && (
+            {patientsData && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>Sắp xếp:</span>
                 <Select
@@ -520,43 +525,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
           </div>
         </CardHeader>
         <CardContent>
-          {viewMode === "folders" ? (
-            <div className="space-y-6">
-              {Object.keys(groupedFolders)
-                .map(Number)
-                .sort((a, b) => b - a)
-                .map((year) => (
-                  <div key={year} className="space-y-3">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Năm {year}
-                    </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                      {groupedFolders[year].map((folder) => (
-                        <Card
-                          key={`${folder.year}-${folder.month}`}
-                          className="cursor-pointer hover:bg-accent/50 transition-colors"
-                          onClick={() =>
-                            handleMonthClick(folder.year, folder.month)
-                          }
-                        >
-                          <CardContent className="p-4 text-center">
-                            <div className="flex flex-col items-center space-y-2">
-                              <Folder className="h-8 w-8 text-primary" />
-                              <div className="text-sm font-medium">
-                                {folder.monthName}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {folder.year}
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          ) : shouldCallAPI && isLoading ? (
+          {shouldCallAPI && isLoading ? (
             <div className="space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
@@ -703,6 +672,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
           )}
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }
