@@ -19,6 +19,7 @@ import {
 	ArrowLeft,
 	MapPin,
 	Heart,
+	QrCode,
 } from "lucide-react"
 import { 
 	usePatientDetails, 
@@ -209,6 +210,18 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 												: patient.dateOfBirth
 												? formatDate(patient.dateOfBirth)
 												: "Chưa cập nhật"}
+										</p>
+									</div>
+								</div>
+
+								<div className="flex items-center gap-2">
+									<QrCode className="h-4 w-4 text-muted-foreground" />
+									<div>
+										<p className="text-sm font-medium">
+											Barcode
+										</p>
+										<p className="text-sm text-muted-foreground font-mono">
+											{patient.barcode || "Chưa cập nhật"}
 										</p>
 									</div>
 								</div>

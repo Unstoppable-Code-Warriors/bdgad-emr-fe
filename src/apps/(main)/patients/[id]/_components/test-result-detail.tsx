@@ -10,7 +10,8 @@ import {
 	Calendar, 
 	FileText, 
 	Download,
-	MapPin
+	MapPin,
+	QrCode
 } from "lucide-react"
 import { useTestResultById } from "@/hooks/use-patients"
 import { getPresignedUrl } from "@/utils/api"
@@ -184,6 +185,16 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 								</div>
 								<span className="text-sm font-mono text-gray-900">{testDetail.patient.citizenId}</span>
 							</div>
+
+							{testDetail.patient.barcode && (
+								<div className="flex justify-between items-center py-2 border-b border-gray-100">
+									<div className="flex items-center gap-2">
+										<QrCode className="h-4 w-4 text-gray-500" />
+										<span className="text-sm font-medium text-gray-700">Barcode</span>
+									</div>
+									<span className="text-sm font-mono text-gray-900">{testDetail.patient.barcode}</span>
+								</div>
+							)}
 
 							{testDetail.patient.dateOfBirth && (
 								<div className="flex justify-between items-center py-2 border-b border-gray-100">

@@ -521,7 +521,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="lastTestDate">
-                      Ngày XN gần nhất
+                      Lần khám gần nhất
                     </SelectItem>
                     <SelectItem value="name">Tên</SelectItem>
                   </SelectContent>
@@ -640,7 +640,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
                       {formatDate(patient.lastTestDate)}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      XN gần nhất
+                      Lần khám gần nhất
                     </div>
                     <Button
                       variant="outline"
