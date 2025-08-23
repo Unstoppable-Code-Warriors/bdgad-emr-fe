@@ -210,6 +210,7 @@ export interface DashboardStats {
 export interface PatientSearchParams {
 	name?: string
 	barcode?: string
+	keyword?: string
 	dateFrom?: string
 	dateTo?: string
 	month?: string // Format: YYYY-MM
