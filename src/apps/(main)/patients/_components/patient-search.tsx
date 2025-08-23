@@ -78,8 +78,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
   });
 
   const [localSearch, setLocalSearch] = useState({
-    name: "",
-    barcode: "",
+    keyword: "",
     dateFrom: undefined as Date | undefined,
     dateTo: undefined as Date | undefined,
   });
@@ -131,8 +130,9 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
     setSelectedMonth(null); // Clear month selection when doing manual search
     setSearchParams((prev) => ({
       ...prev,
-      name: localSearch.name,
-      barcode: localSearch.barcode,
+      keyword: localSearch.keyword,
+      name: undefined, // Clear old name parameter
+      barcode: undefined, // Clear old barcode parameter
       dateFrom: localSearch.dateFrom
         ? format(localSearch.dateFrom, "yyyy-MM-dd")
         : undefined,
@@ -146,8 +146,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 
   const handleClearSearch = useCallback(() => {
     setLocalSearch({
-      name: "",
-      barcode: "",
+      keyword: "",
       dateFrom: undefined,
       dateTo: undefined,
     });
@@ -160,6 +159,11 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
       limit: 10,
       sortBy: "lastTestDate",
       sortOrder: "DESC",
+      keyword: undefined,
+      name: undefined,
+      barcode: undefined,
+      dateFrom: undefined,
+      dateTo: undefined,
       month: undefined, // Clear month parameter
     });
   }, []);
@@ -356,42 +360,27 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
             Tìm Kiếm Bệnh Nhân
           </CardTitle>
           <CardDescription>
-            Tìm kiếm bệnh nhân theo tên, mã barcode hoặc khoảng thời gian
+            Tìm kiếm bệnh nhân theo tên, CCCD hoặc khoảng thời gian lần khám
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-9 lg:grid-cols-11">
+          <div className="grid gap-4 md:grid-cols-5 lg:grid-cols-6">
             <div className="space-y-2 col-span-3">
-              <label className="text-sm font-medium">Tên bệnh nhân</label>
+              <label className="text-sm font-medium">Tìm kiếm</label>
               <Input
-                placeholder="Nhập tên bệnh nhân..."
-                value={localSearch.name}
+                placeholder="Nhập tên bệnh nhân, CCCD..."
+                value={localSearch.keyword}
                 onChange={(e) =>
                   setLocalSearch((prev) => ({
                     ...prev,
-                    name: e.target.value,
+                    keyword: e.target.value,
                   }))
                 }
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
             </div>
 
-            <div className="space-y-2 col-span-3">
-              <label className="text-sm font-medium">Mã Barcode</label>
-              <Input
-                placeholder="Nhập mã barcode..."
-                value={localSearch.barcode}
-                onChange={(e) =>
-                  setLocalSearch((prev) => ({
-                    ...prev,
-                    barcode: e.target.value,
-                  }))
-                }
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
-            </div>
-
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <label className="text-sm font-medium">Từ ngày</label>
               <DatePicker
                 date={localSearch.dateFrom}
@@ -414,7 +403,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
               />
             </div>
 
-            <div className="space-y-2 col-span-2">
+            <div className="space-y-2 col-span-1">
               <label className="text-sm font-medium">Đến ngày</label>
               <DatePicker
                 date={localSearch.dateTo}
