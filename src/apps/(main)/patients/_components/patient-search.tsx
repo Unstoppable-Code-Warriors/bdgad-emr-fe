@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -36,14 +35,11 @@ import {
 } from "@/components/ui/tooltip";
 import {
   Search,
-  User,
   Calendar as CalendarIcon,
-  TestTube,
   ChevronLeft,
   ChevronRight,
   Eye,
   ChevronDown,
-  Folder,
   ArrowLeft,
   FilterX,
 } from "lucide-react";
@@ -56,12 +52,6 @@ import { MonthYearStats } from "@/components/ui/month-year-stats";
 
 interface PatientSearchProps {
   onPatientSelect?: (patient: PatientSummary) => void;
-}
-
-interface MonthFolder {
-  year: number;
-  month: number;
-  monthName: string;
 }
 
 export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
@@ -204,67 +194,6 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
     }
   };
 
-  const getGenderLabel = (gender: string | null) => {
-    switch (gender?.toLowerCase()) {
-      case "male":
-        return "Nam";
-      case "female":
-        return "Nữ";
-      default:
-        return "Khác";
-    }
-  };
-
-  const monthFolders = useMemo(() => {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1;
-    const folders: MonthFolder[] = [];
-    const monthNames = [
-      "Tháng 1",
-      "Tháng 2",
-      "Tháng 3",
-      "Tháng 4",
-      "Tháng 5",
-      "Tháng 6",
-      "Tháng 7",
-      "Tháng 8",
-      "Tháng 9",
-      "Tháng 10",
-      "Tháng 11",
-      "Tháng 12",
-    ];
-
-    // Generate last 3 years
-    for (let yearOffset = 0; yearOffset < 3; yearOffset++) {
-      const year = currentYear - yearOffset;
-      const maxMonth = year === currentYear ? currentMonth : 12;
-
-      // Generate months from 12 down to 1 for each year
-      for (let month = 1; month <= 12; month++) {
-        if (month <= maxMonth) {
-          folders.push({
-            year,
-            month,
-            monthName: monthNames[month - 1],
-          });
-        }
-      }
-    }
-
-    return folders;
-  }, []);
-
-  const groupedFolders = useMemo(() => {
-    const grouped: Record<number, MonthFolder[]> = {};
-    monthFolders.forEach((folder) => {
-      if (!grouped[folder.year]) {
-        grouped[folder.year] = [];
-      }
-      grouped[folder.year].push(folder);
-    });
-    return grouped;
-  }, [monthFolders]);
 
   const handleMonthClick = useCallback((year: number, month: number) => {
     console.log("handleMonthClick called with:", { year, month });
