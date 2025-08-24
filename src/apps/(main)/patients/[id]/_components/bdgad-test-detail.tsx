@@ -42,18 +42,6 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 			return dateString
 		}
 	}
-
-	const getGenderLabel = (gender?: string) => {
-		switch (gender?.toLowerCase()) {
-			case "male":
-				return "Nam"
-			case "female":
-				return "Nữ"
-			default:
-				return "Không xác định"
-		}
-	}
-
 	const extractFilenameFromUrl = (url: string): string => {
 		try {
 			const urlObj = new URL(url)
@@ -192,7 +180,7 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 						{testDetail.patient.gender && (
 							<div className="space-y-1">
 								<p className="text-sm font-medium text-gray-700">Giới tính</p>
-								<Badge variant="secondary">{getGenderLabel(testDetail.patient.gender)}</Badge>
+								<Badge variant="secondary">{testDetail.patient.gender}</Badge>
 							</div>
 						)}
 						{testDetail.patient.address && (

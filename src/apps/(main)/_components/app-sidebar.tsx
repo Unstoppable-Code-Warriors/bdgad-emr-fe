@@ -1,5 +1,5 @@
 import { useNavigate, useLocation, Link } from "react-router-dom"
-import { Users, FileText, LayoutDashboard } from "lucide-react"
+import { Users, FileText } from "lucide-react"
 import {
 	Sidebar,
 	SidebarContent,
@@ -10,12 +10,6 @@ import {
 } from "@/components/ui/sidebar"
 
 const navigation = [
-	{
-		name: "Dashboard",
-		href: "/dashboard",
-		icon: LayoutDashboard,
-		current: false,
-	},
 	{
 		name: "Bệnh nhân",
 		href: "/patients",
@@ -50,7 +44,7 @@ export function AppSidebar() {
 					<div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
 						<FileText className="h-5 w-5 text-white" />
 					</div>
-					<Link to="/dashboard">
+					<Link to="/patients">
 						<h1 className="text-lg font-bold">
 							BDGAD{" "}
 							<span className="border-b border-black">EMR</span>

@@ -300,8 +300,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-5 lg:grid-cols-6">
-            <div className="space-y-2 col-span-3">
+          <div className="flex flex-wrap gap-4">
+            <div className="space-y-2 flex-1 min-w-[200px]">
               <label className="text-sm font-medium">Tìm kiếm</label>
               <Input
                 placeholder="Nhập tên bệnh nhân, CCCD..."
@@ -316,7 +316,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
               />
             </div>
 
-            <div className="space-y-2 col-span-1 grow">
+            <div className="space-y-2 flex-1 min-w-[150px]">
               <label className="text-sm font-medium">Từ ngày</label>
               <DatePicker
                 date={localSearch.dateFrom}
@@ -339,7 +339,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
               />
             </div>
 
-            <div className="space-y-2 col-span-1">
+            <div className="space-y-2 flex-1 min-w-[150px]">
               <label className="text-sm font-medium">Đến ngày</label>
               <DatePicker
                 date={localSearch.dateTo}
@@ -355,7 +355,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
               />
             </div>
 
-            <div className="col-span-1 flex items-end justify-end gap-2">
+            <div className="flex items-end gap-2">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -427,30 +427,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
               </CardDescription>
             </div>
 
-            {patientsData && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Sắp xếp:</span>
-                <Select
-                  value={searchParams.sortBy}
-                  onValueChange={(value: any) =>
-                    setSearchParams((prev) => ({
-                      ...prev,
-                      sortBy: value,
-                    }))
-                  }
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lastTestDate">
-                      Lần khám gần nhất
-                    </SelectItem>
-                    <SelectItem value="name">Tên</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+
           </div>
         </CardHeader>
         <CardContent>

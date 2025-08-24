@@ -83,19 +83,6 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 		}
 	}
 
-	const getGenderLabel = (gender: string | null) => {
-		switch (gender?.toLowerCase()) {
-			case "male":
-				return "Nam"
-			case "female":
-				return "Nữ"
-			default:
-				return "Khác"
-		}
-	}
-
-
-
 
 
 	// Show medical info if available and requested
@@ -236,9 +223,7 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 											variant="secondary"
 											className="mt-1"
 										>
-											{patientDetails?.extendedInfo?.data?.patient?.gender
-												? getGenderLabel(patientDetails.extendedInfo.data.patient.gender)
-												: getGenderLabel(patient.gender)}
+											{patient.gender}
 										</Badge>
 									</div>
 								</div>

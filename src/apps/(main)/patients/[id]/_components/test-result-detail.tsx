@@ -39,17 +39,6 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 		}
 	}
 
-	const getGenderLabel = (gender?: string) => {
-		switch (gender?.toLowerCase()) {
-			case "male":
-				return "Nam"
-			case "female":
-				return "Nữ"
-			default:
-				return "Không xác định"
-		}
-	}
-
 	const extractFilenameFromUrl = (url: string): string => {
 		try {
 			const urlObj = new URL(url)
@@ -212,7 +201,7 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 										<User className="h-4 w-4 text-gray-500" />
 										<span className="text-sm font-medium text-gray-700">Giới tính</span>
 									</div>
-									<Badge variant="secondary">{getGenderLabel(testDetail.patient.gender)}</Badge>
+									<Badge variant="secondary">{testDetail.patient.gender}</Badge>
 								</div>
 							)}
 
