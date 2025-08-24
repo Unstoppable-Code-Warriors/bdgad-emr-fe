@@ -41,7 +41,9 @@ export const CommonQueryToolUI = makeAssistantToolUI<
 				<div className="flex items-center gap-2 text-xs my-2">
 					<CircleX className="text-red-500 size-4" />
 					<span className="text-red-500">
-						Lỗi khi thực hiện truy vấn
+						{args.purpose
+							? args.purpose
+							: "Đang thực hiện truy vấn"}
 					</span>
 				</div>
 			)
@@ -50,7 +52,11 @@ export const CommonQueryToolUI = makeAssistantToolUI<
 		return (
 			<div className="flex items-center gap-2 text-xs my-2">
 				<Check className="text-green-600 size-4" />
-				<span className="text-green-600">Lấy dữ liệu thành công</span>
+				<span className="text-green-600">
+					{args.purpose
+							? args.purpose
+							: "Đang thực hiện truy vấn"}
+				</span>
 			</div>
 		)
 	},
