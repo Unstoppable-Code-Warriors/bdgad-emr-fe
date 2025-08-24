@@ -279,24 +279,31 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 											</div>
 
 											{/* Comment section - full width below buttons */}
-											{code.commentResult && (
+											{code.validation_info && (
 												<div className="pt-3 border-t border-gray-200">
 													<div className="flex items-start gap-3">
 														<div className="p-2 bg-gray-100 rounded-lg">
 															<MessageSquare className="h-4 w-4 text-emerald-600" />
 														</div>
 														<div className="flex-1">
-															<h4 className="font-bold text-gray-800 mb-2">Nhận xét kỹ thuật viên Thẩm định</h4>
-															{code.commentResult.length > 200 ? (
+															<div className="flex items-center gap-4 mb-2">
+																<h4 className="font-bold text-gray-800">Nhận xét kỹ thuật viên Thẩm định</h4>
+																<div className="flex items-center gap-2 text-xs text-gray-600">
+																	<span className="font-medium">{code.validation_info.name}</span>
+																	<span>•</span>
+																	<span>{code.validation_info.email}</span>
+																</div>
+															</div>
+															{code.validation_info.commentResult && code.validation_info.commentResult.length > 200 ? (
 																<textarea 
 																	readOnly 
-																	value={code.commentResult}
+																	value={code.validation_info.commentResult}
 																	className="w-full p-3 text-sm text-gray-800 bg-gray-50 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-																	rows={Math.min(Math.ceil(code.commentResult.length / 80), 6)}
+																	rows={Math.min(Math.ceil(code.validation_info.commentResult.length / 80), 6)}
 																/>
 															) : (
 																<p className="text-sm font-medium text-gray-800 bg-gray-50 px-3 py-2 rounded-lg border border-gray-300">
-																	{code.commentResult}
+																	{code.validation_info.commentResult}
 																</p>
 															)}
 														</div>
