@@ -35,8 +35,8 @@ export const useAuth = (): UseAuthReturn => {
 			try {
 				await loginMutation.mutateAsync(credentials)
 
-				// Navigate to dashboard after successful login
-				navigate("/dashboard")
+						// Navigate to patients page after successful login
+		navigate("/patients")
 			} catch (error) {
 				clearAuthState()
 				throw error

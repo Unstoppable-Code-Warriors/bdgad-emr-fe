@@ -29,15 +29,7 @@ export function usePatientTestHistory(patientId: number) {
 	})
 }
 
-export function useDashboardStats(
-	period: "day" | "week" | "month" | "year" = "week"
-) {
-	return useQuery({
-		queryKey: ["dashboard-stats", period],
-		queryFn: () => PatientService.getDashboardStats(period),
-		staleTime: 1000 * 60 * 2, // 2 minutes
-	})
-}
+// Dashboard stats function removed - dashboard feature has been removed
 
 // New hooks for the additional patient APIs
 export function useTestResultsByPatientKey(patientId: number) {

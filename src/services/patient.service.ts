@@ -2,7 +2,6 @@ import { api } from "@/utils/api"
 import type {
 	PatientSearchResponse,
 	PatientDetails,
-	DashboardStats,
 	PatientSearchParams,
 	TestHistoryItem,
 	TestResultListResponse,
@@ -42,14 +41,7 @@ export class PatientService {
 		return (await response.json()) as TestHistoryItem[]
 	}
 
-	static async getDashboardStats(
-		period: "day" | "week" | "month" | "year" = "week"
-	): Promise<DashboardStats> {
-		const response = await api.get(
-			`patient/dashboard/stats?period=${period}`
-		)
-		return (await response.json()) as DashboardStats
-	}
+	// Dashboard stats method removed - dashboard feature has been removed
 
 	// New API methods
 	static async getTestResultsByPatientKey(

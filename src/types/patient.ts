@@ -189,24 +189,7 @@ export interface PatientSearchResponse {
 	}
 }
 
-export interface DashboardStats {
-	totalPatients: number
-	totalTestsToday: number
-	totalTestsThisWeek: number
-	totalTestsThisMonth: number
-	testsByType: Array<{
-		testCategory: string
-		count: number
-	}>
-	patientsByPeriod: Array<{
-		date: string
-		count: number
-	}>
-	topDiagnoses: Array<{
-		diagnosis: string
-		count: number
-	}>
-}
+// DashboardStats interface removed - dashboard feature has been removed
 
 export interface PatientMonthlyStats {
 	month: number
