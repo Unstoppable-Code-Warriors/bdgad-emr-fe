@@ -39,17 +39,6 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 		}
 	}
 
-	const getGenderLabel = (gender?: string) => {
-		switch (gender?.toLowerCase()) {
-			case "male":
-				return "Nam"
-			case "female":
-				return "Nữ"
-			default:
-				return "Không xác định"
-		}
-	}
-
 	const extractFilenameFromUrl = (url: string): string => {
 		try {
 			const urlObj = new URL(url)

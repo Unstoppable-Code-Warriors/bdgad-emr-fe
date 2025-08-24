@@ -83,19 +83,6 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 		}
 	}
 
-	const getGenderLabel = (gender: string | null) => {
-		switch (gender?.toLowerCase()) {
-			case "male":
-				return "Nam"
-			case "female":
-				return "Nữ"
-			default:
-				return "Khác"
-		}
-	}
-
-
-
 
 
 	// Show medical info if available and requested
