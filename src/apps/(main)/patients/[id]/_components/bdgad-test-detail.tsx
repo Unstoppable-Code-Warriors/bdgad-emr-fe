@@ -192,7 +192,7 @@ export function BdgadTestDetail({ testRunKey, testNumber, onBack }: BdgadTestDet
 						{testDetail.patient.gender && (
 							<div className="space-y-1">
 								<p className="text-sm font-medium text-gray-700">Giới tính</p>
-								<Badge variant="secondary">{getGenderLabel(testDetail.patient.gender)}</Badge>
+								<Badge variant="secondary">{testDetail.patient.gender}</Badge>
 							</div>
 						)}
 						{testDetail.patient.address && (

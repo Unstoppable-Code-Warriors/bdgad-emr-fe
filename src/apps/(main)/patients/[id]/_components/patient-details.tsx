@@ -236,9 +236,7 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 											variant="secondary"
 											className="mt-1"
 										>
-											{patientDetails?.extendedInfo?.data?.patient?.gender
-												? getGenderLabel(patientDetails.extendedInfo.data.patient.gender)
-												: getGenderLabel(patient.gender)}
+											{patient.gender}
 										</Badge>
 									</div>
 								</div>

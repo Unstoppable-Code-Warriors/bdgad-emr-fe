@@ -212,7 +212,7 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 										<User className="h-4 w-4 text-gray-500" />
 										<span className="text-sm font-medium text-gray-700">Giới tính</span>
 									</div>
-									<Badge variant="secondary">{getGenderLabel(testDetail.patient.gender)}</Badge>
+									<Badge variant="secondary">{testDetail.patient.gender}</Badge>
 								</div>
 							)}
 
