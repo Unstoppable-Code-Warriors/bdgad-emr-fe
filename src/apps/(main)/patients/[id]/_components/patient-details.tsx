@@ -84,7 +84,6 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 	}
 
 
-
 	// Show medical info if available and requested
 	if (showMedicalInfo && patientDetails?.extendedInfo) {
 		return (
