@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -36,14 +35,11 @@ import {
 } from "@/components/ui/tooltip";
 import {
   Search,
-  User,
   Calendar as CalendarIcon,
-  TestTube,
   ChevronLeft,
   ChevronRight,
   Eye,
   ChevronDown,
-  Folder,
   ArrowLeft,
   FilterX,
 } from "lucide-react";
@@ -52,15 +48,10 @@ import { usePatients } from "@/hooks/use-patients";
 import type { PatientSearchParams, PatientSummary } from "@/types/patient";
 import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
+import { MonthYearStats } from "@/components/ui/month-year-stats";
 
 interface PatientSearchProps {
   onPatientSelect?: (patient: PatientSummary) => void;
-}
-
-interface MonthFolder {
-  year: number;
-  month: number;
-  monthName: string;
 }
 
 export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
@@ -91,15 +82,14 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
   );
   const finalSearchParams = useMemo(() => {
     if (selectedMonth && !hasActiveSearch) {
-      // Use the new month parameter instead of dateFrom/dateTo for folder clicks
-      const monthParam = `${selectedMonth.year}-${selectedMonth.month
-        .toString()
-        .padStart(2, "0")}`;
+      // Use the new folderMonth and folderYear parameters for folder clicks
       const params = {
         ...searchParams,
-        month: monthParam,
+        folderMonth: selectedMonth.month,
+        folderYear: selectedMonth.year,
       };
       console.log("Month folder search params:", params);
+      console.log("Selected month object:", selectedMonth);
       return params;
     }
     console.log("Manual search params:", searchParams);
@@ -140,6 +130,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
         ? format(localSearch.dateTo, "yyyy-MM-dd")
         : undefined,
       month: undefined, // Clear month parameter for manual search
+      folderMonth: undefined, // Clear folder parameters for manual search
+      folderYear: undefined,
       page: 1, // Reset to first page when searching
     }));
   }, [localSearch]);
@@ -165,6 +157,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
       dateFrom: undefined,
       dateTo: undefined,
       month: undefined, // Clear month parameter
+      folderMonth: undefined, // Clear folder parameters
+      folderYear: undefined,
     });
   }, []);
 
@@ -200,69 +194,9 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
     }
   };
 
-  const getGenderLabel = (gender: string | null) => {
-    switch (gender?.toLowerCase()) {
-      case "male":
-        return "Nam";
-      case "female":
-        return "Nữ";
-      default:
-        return "Khác";
-    }
-  };
-
-  const monthFolders = useMemo(() => {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1;
-    const folders: MonthFolder[] = [];
-    const monthNames = [
-      "Tháng 1",
-      "Tháng 2",
-      "Tháng 3",
-      "Tháng 4",
-      "Tháng 5",
-      "Tháng 6",
-      "Tháng 7",
-      "Tháng 8",
-      "Tháng 9",
-      "Tháng 10",
-      "Tháng 11",
-      "Tháng 12",
-    ];
-
-    // Generate last 3 years
-    for (let yearOffset = 0; yearOffset < 3; yearOffset++) {
-      const year = currentYear - yearOffset;
-      const maxMonth = year === currentYear ? currentMonth : 12;
-
-      // Generate months from 12 down to 1 for each year
-      for (let month = 1; month <= 12; month++) {
-        if (month <= maxMonth) {
-          folders.push({
-            year,
-            month,
-            monthName: monthNames[month - 1],
-          });
-        }
-      }
-    }
-
-    return folders;
-  }, []);
-
-  const groupedFolders = useMemo(() => {
-    const grouped: Record<number, MonthFolder[]> = {};
-    monthFolders.forEach((folder) => {
-      if (!grouped[folder.year]) {
-        grouped[folder.year] = [];
-      }
-      grouped[folder.year].push(folder);
-    });
-    return grouped;
-  }, [monthFolders]);
 
   const handleMonthClick = useCallback((year: number, month: number) => {
+    console.log("handleMonthClick called with:", { year, month });
     setSelectedMonth({ year, month });
     setViewMode("patients");
     setHasActiveSearch(false);
@@ -280,6 +214,8 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
       limit: 10,
       sortBy: "lastTestDate",
       sortOrder: "DESC",
+      folderMonth: undefined,
+      folderYear: undefined,
     });
   }, []);
 
@@ -462,38 +398,36 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
       </Card>
 
       {/* Results */}
-      <Card>
+      {viewMode === "folders" ? (
+        <MonthYearStats onMonthClick={handleMonthClick} />
+      ) : (
+        <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                {viewMode === "patients" &&
-                  (selectedMonth || hasActiveSearch) && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleBackToFolders}
-                      className="mr-2"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                  )}
-                {viewMode === "folders"
-                  ? "Thư Mục Tháng"
-                  : selectedMonth && !hasActiveSearch
+                {(selectedMonth || hasActiveSearch) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBackToFolders}
+                    className="mr-2"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                )}
+                {selectedMonth && !hasActiveSearch
                   ? `Bệnh Nhân - ${selectedMonth.month}/${selectedMonth.year}`
                   : "Danh Sách Bệnh Nhân"}
               </CardTitle>
               <CardDescription>
-                {viewMode === "folders"
-                  ? "Chọn tháng để xem danh sách bệnh nhân"
-                  : patientsData
+                {patientsData
                   ? `Tìm thấy ${patientsData.pagination.total} bệnh nhân`
                   : "Đang tải..."}
               </CardDescription>
             </div>
 
-            {viewMode === "patients" && patientsData && (
+            {patientsData && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>Sắp xếp:</span>
                 <Select
@@ -520,43 +454,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
           </div>
         </CardHeader>
         <CardContent>
-          {viewMode === "folders" ? (
-            <div className="space-y-6">
-              {Object.keys(groupedFolders)
-                .map(Number)
-                .sort((a, b) => b - a)
-                .map((year) => (
-                  <div key={year} className="space-y-3">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Năm {year}
-                    </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                      {groupedFolders[year].map((folder) => (
-                        <Card
-                          key={`${folder.year}-${folder.month}`}
-                          className="cursor-pointer hover:bg-accent/50 transition-colors"
-                          onClick={() =>
-                            handleMonthClick(folder.year, folder.month)
-                          }
-                        >
-                          <CardContent className="p-4 text-center">
-                            <div className="flex flex-col items-center space-y-2">
-                              <Folder className="h-8 w-8 text-primary" />
-                              <div className="text-sm font-medium">
-                                {folder.monthName}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {folder.year}
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          ) : shouldCallAPI && isLoading ? (
+          {shouldCallAPI && isLoading ? (
             <div className="space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
@@ -602,23 +500,9 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
 
                     <div className="space-y-1">
                       <h4 className="font-semibold">{patient.fullName}</h4>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <User className="h-3 w-3" />
-                          {patient.dateOfBirth
-                            ? formatDate(patient.dateOfBirth)
-                            : "N/A"}
-                        </span>
-                        <Badge variant="secondary" className="text-xs">
-                          {getGenderLabel(patient.gender)}
-                        </Badge>
-                        <span className="flex items-center gap-1">
-                          <TestTube className="h-3 w-3" />
-                          {patient.totalTests} XN
-                        </span>
-                      </div>
+
                       <div className="text-xs text-muted-foreground">
-                        Barcode: {patient.barcode}
+                        CCCD: {patient.citizenID || "N/A"}
                       </div>
                     </div>
                   </div>
@@ -652,14 +536,42 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
               ))}
 
               {/* Pagination */}
-              {patientsData.pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between pt-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4">
+                {/* Info and Limit Selector */}
+                <div className="flex items-center gap-4">
                   <div className="text-sm text-muted-foreground">
-                    Trang {patientsData.pagination.page} /{" "}
-                    {patientsData.pagination.totalPages}(
-                    {patientsData.pagination.total} bệnh nhân)
+                    Hiển thị {((patientsData.pagination.page - 1) * patientsData.pagination.limit) + 1} - {Math.min(patientsData.pagination.page * patientsData.pagination.limit, patientsData.pagination.total)} trong tổng số {patientsData.pagination.total} bệnh nhân
                   </div>
                   <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Hiển thị:</span>
+                    <Select
+                      value={searchParams.limit?.toString() || "10"}
+                      onValueChange={(value) =>
+                        setSearchParams((prev) => ({
+                          ...prev,
+                          limit: parseInt(value),
+                          page: 1, // Reset to first page when changing limit
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="w-20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="20">20</SelectItem>
+                        <SelectItem value="30">30</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                        <SelectItem value="100">100</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Page Numbers */}
+                {patientsData.pagination.totalPages > 1 && (
+                  <div className="flex items-center gap-1">
+                    {/* Previous Button */}
                     <Button
                       variant="outline"
                       size="sm"
@@ -669,8 +581,77 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
                       disabled={!patientsData.pagination.hasPrev}
                     >
                       <ChevronLeft className="h-4 w-4" />
-                      Trước
                     </Button>
+
+                    {/* Page Numbers */}
+                    {(() => {
+                      const currentPage = patientsData.pagination.page;
+                      const totalPages = patientsData.pagination.totalPages;
+                      const pages = [];
+
+                      // Always show first page
+                      if (currentPage > 3) {
+                        pages.push(
+                          <Button
+                            key={1}
+                            variant={1 === currentPage ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handlePageChange(1)}
+                          >
+                            1
+                          </Button>
+                        );
+                        if (currentPage > 4) {
+                          pages.push(
+                            <span key="ellipsis1" className="px-2 text-muted-foreground">
+                              ...
+                            </span>
+                          );
+                        }
+                      }
+
+                      // Show pages around current page
+                      const startPage = Math.max(1, currentPage - 2);
+                      const endPage = Math.min(totalPages, currentPage + 2);
+
+                      for (let i = startPage; i <= endPage; i++) {
+                        pages.push(
+                          <Button
+                            key={i}
+                            variant={i === currentPage ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handlePageChange(i)}
+                          >
+                            {i}
+                          </Button>
+                        );
+                      }
+
+                      // Always show last page
+                      if (currentPage < totalPages - 2) {
+                        if (currentPage < totalPages - 3) {
+                          pages.push(
+                            <span key="ellipsis2" className="px-2 text-muted-foreground">
+                              ...
+                            </span>
+                          );
+                        }
+                        pages.push(
+                          <Button
+                            key={totalPages}
+                            variant={totalPages === currentPage ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handlePageChange(totalPages)}
+                          >
+                            {totalPages}
+                          </Button>
+                        );
+                      }
+
+                      return pages;
+                    })()}
+
+                    {/* Next Button */}
                     <Button
                       variant="outline"
                       size="sm"
@@ -679,12 +660,11 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
                       }
                       disabled={!patientsData.pagination.hasNext}
                     >
-                      Sau
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ) : shouldCallAPI ? (
             <EmptyState
@@ -703,6 +683,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
           )}
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

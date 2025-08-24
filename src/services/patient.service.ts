@@ -9,6 +9,7 @@ import type {
 	TestResultDetailsDto,
 	BdgadTestListResponse,
 	BdgadTestDetailsDto,
+	PatientByMonthYearResponse,
 } from "@/types/patient"
 
 export class PatientService {
@@ -77,5 +78,10 @@ export class PatientService {
 	): Promise<BdgadTestDetailsDto> {
 		const response = await api.get(`patient/bdgad-tests/${testRunKey}`)
 		return (await response.json()) as BdgadTestDetailsDto
+	}
+
+	static async getMonthYearStats(): Promise<PatientByMonthYearResponse> {
+		const response = await api.get(`patient/month-year-stats`)
+		return (await response.json()) as PatientByMonthYearResponse
 	}
 }

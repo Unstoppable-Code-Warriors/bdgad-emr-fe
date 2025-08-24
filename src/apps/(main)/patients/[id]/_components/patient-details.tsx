@@ -178,7 +178,7 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
 										{patient.fullName}
 									</h2>
 									<p className="text-muted-foreground">
-										ID: {patient.patientKey}
+										PatientID: {patient.patientKey}
 									</p>
 								</div>
 								

@@ -4,6 +4,7 @@ export interface PatientSummary {
 	dateOfBirth: string | null
 	gender: string | null
 	barcode: string
+	citizenID?: string
 	address: string | null
 	lastTestDate: string
 	totalTests: number
@@ -207,6 +208,21 @@ export interface DashboardStats {
 	}>
 }
 
+export interface PatientMonthlyStats {
+	month: number
+	total: number
+}
+
+export interface PatientYearlyStats {
+	year: number
+	total: number
+	months: PatientMonthlyStats[]
+}
+
+export interface PatientByMonthYearResponse {
+	data: PatientYearlyStats[]
+}
+
 export interface PatientSearchParams {
 	name?: string
 	barcode?: string
@@ -214,6 +230,8 @@ export interface PatientSearchParams {
 	dateFrom?: string
 	dateTo?: string
 	month?: string // Format: YYYY-MM
+	folderMonth?: number
+	folderYear?: number
 	testType?: string
 	diagnosis?: string
 	page?: number
