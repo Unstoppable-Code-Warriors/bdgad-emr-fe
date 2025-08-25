@@ -5,6 +5,7 @@ export interface GeneralFile {
 	file_size: number
 	uploaded_at: string
 	send_emr_at: string
+	file_path: string
 }
 
 export interface FileCategory {

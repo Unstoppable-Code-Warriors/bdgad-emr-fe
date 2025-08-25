@@ -150,4 +150,26 @@ export const getPresignedUrl = async (filePath: string): Promise<string> => {
   }
 };
 
+
+export const getPresignedUrlGeneralFiles = async (filePath: string): Promise<string> => {
+  try {
+    const response = await externalApi.post(
+      "staff/general-file-presigned-url",
+      {
+        json: { filePath },
+      }
+    );
+    return await response.text();
+  } catch (error) {
+    console.error(`Presigned URL API Error:`, error);
+
+    if (error instanceof HTTPError) {
+      const errorBody = await error.response.text();
+      console.error("Error body:", errorBody);
+    }
+
+    throw error;
+  }
+};
+
 export default api;
