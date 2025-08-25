@@ -1,8 +1,8 @@
 import { clearTokensOutside, getAccessToken } from "@/stores/auth.store";
 import ky, { HTTPError } from "ky";
 
-// export const BASE_URL = "https://emr-be.bdgad.bio/api/v1";
-export const BASE_URL = "http://localhost:4000/api/v1";
+export const BASE_URL = "https://emr-be.bdgad.bio/api/v1";
+// export const BASE_URL = "http://localhost:4000/api/v1";
 export const BE_SERVICE_URL = "https://be.bdgad.bio/api/v1";
 
 // Create ky instance for main API
