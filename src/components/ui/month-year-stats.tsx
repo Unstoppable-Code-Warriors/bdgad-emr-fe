@@ -109,7 +109,7 @@ export function MonthYearStats({ onMonthClick }: MonthYearStatsProps) {
 						<AccordionItem 
 							key={yearStats.year} 
 							value={yearStats.year.toString()}
-							className="border-2 rounded-lg px-4 py-2 mb-3"
+							className="border rounded-lg px-4 py-2 mb-3"
 						>
 							<AccordionTrigger className="hover:no-underline">
 								<div className="flex items-center justify-between w-full pr-4">

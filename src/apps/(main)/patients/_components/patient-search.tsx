@@ -335,7 +335,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
                   })
                 }
                 maxDate={localSearch.dateTo}
-                placeholder="Chọn ngày bắt đầu..."
+                // placeholder="Chọn ngày bắt đầu..."
               />
             </div>
 
@@ -351,7 +351,7 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
                   setErrors({});
                 }}
                 minDate={localSearch.dateFrom}
-                placeholder="Chọn ngày kết thúc..."
+                // placeholder="Chọn ngày kết thúc..."
               />
             </div>
 
