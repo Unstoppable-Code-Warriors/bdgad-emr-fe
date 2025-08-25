@@ -4,10 +4,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { useFilesByCategories } from "@/hooks/use-general-files";
-import { GeneralFilesService } from "@/services/general-files.service";
 import type { GeneralFile, FileCategory } from "@/types/general-files";
 import { FileText, Folder, Download, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import {  getPresignedUrlGeneralFiles } from "@/utils/api";
 
 export default function GeneralFilesPage() {
   const { data, isLoading, isError } = useFilesByCategories();
@@ -16,6 +16,8 @@ export default function GeneralFilesPage() {
   const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
     null
   );
+
+  console.log("data", data);  
 
   const filteredFolders = useMemo(() => {
     if (!data?.categories) return [];
@@ -38,21 +40,10 @@ export default function GeneralFilesPage() {
   const handleDownloadFile = async (file: GeneralFile) => {
     setDownloadingFileId(file.id);
     try {
-      const blob = await GeneralFilesService.downloadFile(file.id);
+      console.log("file.file_path", file.file_path);
 
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${file.file_name}.${file.file_type}`;
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(link);
-
-      toast.success(`Đã tải xuống: ${file.file_name}`);
+      const presignedUrl = await getPresignedUrlGeneralFiles(file.file_path);
+      window.open(presignedUrl, "_blank");
     } catch (error) {
       console.error("Download failed:", error);
       toast.error("Không thể tải xuống file. Vui lòng thử lại.");
@@ -291,7 +282,6 @@ export default function GeneralFilesPage() {
                         <div className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg mx-auto w-16 h-16 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                           <Folder className="h-8 w-8 text-white" />
                         </div>
-                      
                       </div>
                       <div>
                         <h3 className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors text-lg">

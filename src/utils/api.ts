@@ -1,8 +1,8 @@
 import { clearTokensOutside, getAccessToken } from "@/stores/auth.store";
 import ky, { HTTPError } from "ky";
 
-export const BASE_URL = "https://emr-be.bdgad.bio/api/v1";
-// export const BASE_URL = "http://localhost:4000/api/v1";
+// export const BASE_URL = "https://emr-be.bdgad.bio/api/v1";
+export const BASE_URL = "http://localhost:4000/api/v1";
 export const BE_SERVICE_URL = "https://be.bdgad.bio/api/v1";
 
 // Create ky instance for main API
@@ -133,6 +133,28 @@ export const getPresignedUrl = async (filePath: string): Promise<string> => {
   try {
     const response = await externalApi.post(
       "staff/patient-files/get-presigned-url",
+      {
+        json: { filePath },
+      }
+    );
+    return await response.text();
+  } catch (error) {
+    console.error(`Presigned URL API Error:`, error);
+
+    if (error instanceof HTTPError) {
+      const errorBody = await error.response.text();
+      console.error("Error body:", errorBody);
+    }
+
+    throw error;
+  }
+};
+
+
+export const getPresignedUrlGeneralFiles = async (filePath: string): Promise<string> => {
+  try {
+    const response = await externalApi.post(
+      "staff/general-file-presigned-url",
       {
         json: { filePath },
       }
