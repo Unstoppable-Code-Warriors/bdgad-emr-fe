@@ -8,6 +8,7 @@ import { ExploreDBToolUI } from "./explore-db-tool-ui"
 import { CommonQueryToolUI } from "./common-query-tool-ui"
 import { SearchPatientsToolUI } from "./search-patients-tool-ui"
 import { GetPatientHealthRecordToolUI } from "./get-patient-health-record-tool-ui"
+import { WebSearchToolUI } from "./web-search-tool-ui"
 
 const AI_API = "https://ai.bdgad.bio"
 // const AI_API = "http://localhost:4000/api/v1/ai-chat"
@@ -49,6 +50,7 @@ export function AIRuntimeProvider({
 				<CommonQueryToolUI />
 				<SearchPatientsToolUI />
 				<GetPatientHealthRecordToolUI />
+				<WebSearchToolUI />
 			</AssistantRuntimeProvider>
 		</ChatContext.Provider>
 	)
