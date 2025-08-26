@@ -2,11 +2,6 @@ import { makeAssistantToolUI } from "@assistant-ui/react"
 import { Spinner } from "../ui/shadcn-io/spinner"
 import { Check, CircleX } from "lucide-react"
 
-type PatientIdentifier = {
-	patientName?: string
-	citizenId?: string
-}
-
 type RecordType = "exam" | "medical" | "validation"
 
 type PatientSummary = {
@@ -22,7 +17,7 @@ type PatientSummary = {
 }
 
 type GetPatientHealthRecordArgs = {
-	patientIdentifier: PatientIdentifier
+	patientKey: number
 	recordType?: RecordType
 	countOnly?: boolean
 	includeHistory: boolean
@@ -33,7 +28,7 @@ type GetPatientHealthRecordResult = {
 	success: boolean
 	purpose: string
 	doctorId: number
-	patientIdentifier: PatientIdentifier
+	patientKey: number
 	patientSummary?: PatientSummary
 	healthRecords?: any[]
 	totalRecords?: number
