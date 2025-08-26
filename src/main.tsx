@@ -41,7 +41,6 @@ const routes = createBrowserRouter([
 				loader: authLoader,
 				element: <MainLayout />,
 				children: [
-
 					{
 						path: "patients",
 						element: <PatientsPage />,
@@ -72,6 +71,10 @@ const routes = createBrowserRouter([
 					{
 						path: "forgot-password",
 						element: <ForgotPasswordPage />,
+					},
+					{
+						path: "new-password",
+						element: <ResetPasswordPage />,
 					},
 					{
 						path: "reset-password",
