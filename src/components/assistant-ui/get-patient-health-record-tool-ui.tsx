@@ -7,6 +7,8 @@ type PatientIdentifier = {
 	citizenId?: string
 }
 
+type RecordType = "exam" | "medical" | "validation"
+
 type PatientSummary = {
 	patientKey: number
 	fullName: string
@@ -21,6 +23,8 @@ type PatientSummary = {
 
 type GetPatientHealthRecordArgs = {
 	patientIdentifier: PatientIdentifier
+	recordType?: RecordType
+	countOnly?: boolean
 	includeHistory: boolean
 	purpose: string
 }
