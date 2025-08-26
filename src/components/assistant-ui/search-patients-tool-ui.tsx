@@ -77,7 +77,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 							</div>
 						</div>
 						<div className="text-xs text-gray-400">
-							{patient.VisitCount} lần khám
+							{patient.VisitCount} lần xét nghiệm
 						</div>
 					</div>
 				</HoverCardTrigger>
@@ -140,7 +140,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 								<div className="w-3 h-3 bg-green-500 rounded-full"></div>
 								<div>
 									<div className="text-xs text-gray-500">
-										Số lần khám
+										Số lần xét nghiệm
 									</div>
 									<div className="font-medium">
 										{patient.VisitCount} lần
@@ -195,7 +195,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 								</div>
 								<div className="text-right">
 									<div className="text-xs text-gray-500">
-										Số lần khám
+										Số lần xét nghiệm
 									</div>
 									<span className="inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
 										{patient.VisitCount} lần
