@@ -361,7 +361,7 @@ export function BdgadTestDetail({
                           </h4>
                           <p className="text-sm font-semibold text-gray-800 bg-gray-100 px-3 py-1 rounded-full inline-block">
                             {code.type === "general"
-                              ? "Tài liệu chung"
+                              ? "Tài liệu khác"
                               : code.type}
                           </p>
                         </div>

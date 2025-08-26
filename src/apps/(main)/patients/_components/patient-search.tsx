@@ -489,9 +489,6 @@ export function PatientSearch({ onPatientSelect }: PatientSearchProps) {
                       <CalendarIcon className="h-3 w-3" />
                       {formatDate(patient.lastTestDate)}
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      Lần khám gần nhất
-                    </div>
                     <Button
                       variant="outline"
                       size="sm"
