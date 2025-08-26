@@ -266,7 +266,7 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
         <TabsContent value="bdgad" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Lịch sử lần xét nghiệm gen</CardTitle>
+              <CardTitle>Lịch sử lần khám xét nghiệm gen</CardTitle>
             </CardHeader>
             <CardContent>
               {isLoadingBdgadTests ? (
@@ -296,7 +296,7 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
                       >
                         <div className="flex items-start justify-between">
                           <div>
-                            <h4 className="font-semibold">Lần {index + 1}</h4>
+                            <h4 className="font-semibold">Lần khám {index + 1}</h4>
                             <div className="flex items-center gap-2 mt-1">
                               <Badge className="bg-blue-100 text-blue-800">
                                 {test.totalFiles} tệp tin
