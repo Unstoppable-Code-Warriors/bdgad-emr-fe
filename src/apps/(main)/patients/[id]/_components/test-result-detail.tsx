@@ -7,7 +7,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { 
 	ArrowLeft, 
 	User, 
-	Calendar, 
 	FileText, 
 	Download,
 	MapPin,
@@ -27,17 +26,6 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 	const { data: testDetail, isLoading } = useTestResultById(testRunKey)
 	const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(new Set())
 
-	const formatDate = (dateString: string) => {
-		try {
-			return new Date(dateString).toLocaleDateString("vi-VN", {
-				year: "numeric",
-				month: "long",
-				day: "numeric"
-			})
-		} catch {
-			return dateString
-		}
-	}
 
 	const extractFilenameFromUrl = (url: string): string => {
 		try {
@@ -139,9 +127,6 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 					</Button>
 					<div>
 						<h1 className="text-2xl font-bold">Kết quả xét nghiệm lần {testNumber}</h1>
-						<p className="text-muted-foreground">
-							Ngày thực hiện: {formatDate(testDetail.date)}
-						</p>
 					</div>
 				</div>
 				<Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
@@ -183,16 +168,6 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 										<span className="text-sm font-medium text-gray-700">Barcode</span>
 									</div>
 									<span className="text-sm font-mono text-gray-900">{testDetail.patient.barcode}</span>
-								</div>
-							)}
-
-							{testDetail.patient.dateOfBirth && (
-								<div className="flex justify-between items-center py-2 border-b border-gray-100">
-									<div className="flex items-center gap-2">
-										<Calendar className="h-4 w-4 text-gray-500" />
-										<span className="text-sm font-medium text-gray-700">Ngày sinh</span>
-									</div>
-									<span className="text-sm text-gray-900">{formatDate(testDetail.patient.dateOfBirth)}</span>
 								</div>
 							)}
 

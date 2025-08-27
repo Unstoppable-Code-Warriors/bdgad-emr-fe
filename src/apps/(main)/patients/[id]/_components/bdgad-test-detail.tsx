@@ -37,18 +37,6 @@ export function BdgadTestDetail({
   const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(
     new Set()
   );
-
-  const formatDate = (dateString: string) => {
-    try {
-      return new Date(dateString).toLocaleDateString("vi-VN", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return dateString;
-    }
-  };
   const extractFilenameFromUrl = (url: string): string => {
     try {
       const urlObj = new URL(url);
@@ -160,11 +148,6 @@ export function BdgadTestDetail({
             <h1 className="text-2xl font-bold">
               Chi tiết lần khám {testNumber}
             </h1>
-            <div className="text-right">
-              <p className="text-md text-muted-foreground">
-                Ngày thực hiện: {formatDate(testDetail.date)}
-              </p>
-            </div>
           </div>
         </div>
       </div>
@@ -191,14 +174,6 @@ export function BdgadTestDetail({
                 {testDetail.patient.citizenId}
               </p>
             </div>
-            {testDetail.patient.dateOfBirth && (
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-gray-700">Ngày sinh</p>
-                <p className="text-sm text-gray-900">
-                  {formatDate(testDetail.patient.dateOfBirth)}
-                </p>
-              </div>
-            )}
             {testDetail.patient.gender && (
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-700">Giới tính</p>
@@ -206,7 +181,7 @@ export function BdgadTestDetail({
               </div>
             )}
             {testDetail.patient.address && (
-              <div className="space-y-1 md:col-span-2 lg:col-span-4">
+              <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-700">Địa chỉ</p>
                 <p className="text-sm text-gray-900">
                   {testDetail.patient.address}

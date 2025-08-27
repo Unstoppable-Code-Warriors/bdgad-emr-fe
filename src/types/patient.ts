@@ -111,6 +111,7 @@ export interface TestResultSummaryDto {
 	testRunKey: number
 	date: string
 	totalFiles: number
+	labcode?: string
 }
 
 export interface TestResultDetailsDto {
@@ -137,6 +138,7 @@ export interface BdgadTestSummaryDto {
 	date: string
 	totalFiles: number
 	caseId: string
+	labcode?: string
 }
 
 export interface BdgadTestDetailsDto {
