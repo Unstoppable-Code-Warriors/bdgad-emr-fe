@@ -385,7 +385,7 @@ export function BdgadTestDetail({
                                   <Download className="h-4 w-4" />
                                   {downloadingFiles.has(fileUrl)
                                     ? "Đang tải..."
-                                    : `Tải ${fileName}`}
+                                    : `${fileName}`}
                                 </Button>
                               );
                             }
