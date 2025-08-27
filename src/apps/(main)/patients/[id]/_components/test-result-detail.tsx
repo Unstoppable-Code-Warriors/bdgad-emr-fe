@@ -242,7 +242,7 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 												<div className="flex items-center gap-3">
 													<FileText className="h-5 w-5 text-purple-600" />
 													<div>
-														<p className="text-sm font-medium text-gray-900">
+														<p className="text-sm font-medium text-gray-900 truncate max-w-[300px]" title={fileName}>
 															{fileName}
 														</p>
 														<p className="text-xs text-gray-500">
