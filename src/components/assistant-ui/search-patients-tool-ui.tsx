@@ -25,13 +25,13 @@ type SearchPatientsArgs = {
 }
 
 type Patient = {
-	PatientKey: string
-	FullName: string
-	DateOfBirth: string
-	Gender: string
+	patientKey: string
+	fullName: string
+	dateOfBirth: string
+	gender: string
 	citizenID: string
-	Address: string
-	VisitCount: string
+	address: string
+	totalTests: string
 }
 
 type SearchPatientsResult = {
@@ -63,21 +63,21 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 				<HoverCardTrigger asChild>
 					<div
 						className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 cursor-pointer transition-all duration-200 group"
-						onClick={() => handlePatientClick(patient.PatientKey)}
+						onClick={() => handlePatientClick(patient.patientKey)}
 					>
 						<div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
 							<User className="size-4 text-blue-600" />
 						</div>
 						<div className="flex-1 min-w-0">
 							<div className="font-medium text-gray-900 truncate">
-								{patient.FullName}
+								{patient.fullName}
 							</div>
 							<div className="text-xs text-gray-500">
-								{patient.Gender} • {patient.DateOfBirth}
+								{patient.gender} • {patient.dateOfBirth}
 							</div>
 						</div>
 						<div className="text-xs text-gray-400">
-							{patient.VisitCount} lần xét nghiệm
+							{patient.totalTests} lần xét nghiệm
 						</div>
 					</div>
 				</HoverCardTrigger>
@@ -89,10 +89,10 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 							</div>
 							<div>
 								<div className="font-semibold text-gray-900">
-									{patient.FullName}
+									{patient.fullName}
 								</div>
 								<div className="text-sm text-gray-500">
-									Mã bệnh nhân: {patient.PatientKey}
+									Mã bệnh nhân: {patient.patientKey}
 								</div>
 							</div>
 						</div>
@@ -104,7 +104,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 										Ngày sinh
 									</div>
 									<div className="font-medium">
-										{patient.DateOfBirth}
+										{patient.dateOfBirth}
 									</div>
 								</div>
 							</div>
@@ -122,7 +122,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 							<div className="flex items-center gap-2">
 								<div
 									className={`w-3 h-3 rounded-full ${
-										patient.Gender === "Nam"
+										patient.gender === "Nam"
 											? "bg-blue-500"
 											: "bg-pink-500"
 									}`}
@@ -132,7 +132,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 										Giới tính
 									</div>
 									<div className="font-medium">
-										{patient.Gender}
+										{patient.gender}
 									</div>
 								</div>
 							</div>
@@ -143,7 +143,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 										Số lần xét nghiệm
 									</div>
 									<div className="font-medium">
-										{patient.VisitCount} lần
+										{patient.totalTests} lần
 									</div>
 								</div>
 							</div>
@@ -156,7 +156,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 										Địa chỉ
 									</div>
 									<div className="text-sm leading-relaxed">
-										{patient.Address}
+										{patient.address}
 									</div>
 								</div>
 							</div>
@@ -170,7 +170,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 		const FullPatientCard = ({ patient }: { patient: Patient }) => (
 			<Card
 				className="group hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 py-2"
-				onClick={() => handlePatientClick(patient.PatientKey)}
+				onClick={() => handlePatientClick(patient.patientKey)}
 			>
 				<CardContent className="p-4">
 					<div className="flex gap-4">
@@ -187,10 +187,10 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 							<div className="flex items-center justify-between mb-3">
 								<div>
 									<h3 className="font-semibold text-gray-900 text-sm group-hover:text-blue-700 transition-colors">
-										{patient.FullName}
+										{patient.fullName}
 									</h3>
 									<p className="text-xs text-gray-500 font-mono">
-										ID: {patient.PatientKey}
+										ID: {patient.patientKey}
 									</p>
 								</div>
 								<div className="text-right">
@@ -198,7 +198,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 										Số lần xét nghiệm
 									</div>
 									<span className="inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
-										{patient.VisitCount} lần
+										{patient.totalTests} lần
 									</span>
 								</div>
 							</div>
@@ -212,7 +212,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 											Ngày sinh
 										</div>
 										<div className="font-medium text-gray-900">
-											{patient.DateOfBirth}
+											{patient.dateOfBirth}
 										</div>
 									</div>
 								</div>
@@ -220,7 +220,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 								<div className="flex items-center gap-2">
 									<div
 										className={`w-3 h-3 rounded-full flex-shrink-0 ${
-											patient.Gender === "Nam"
+											patient.gender === "Nam"
 												? "bg-blue-500"
 												: "bg-pink-500"
 										}`}
@@ -230,7 +230,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 											Giới tính
 										</div>
 										<div className="font-medium text-gray-900">
-											{patient.Gender}
+											{patient.gender}
 										</div>
 									</div>
 								</div>
@@ -257,12 +257,12 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 											<Tooltip>
 												<TooltipTrigger asChild>
 													<div className="font-medium text-gray-900 truncate cursor-help">
-														{patient.Address}
+														{patient.address}
 													</div>
 												</TooltipTrigger>
 												<TooltipContent>
 													<p className="max-w-xs">
-														{patient.Address}
+														{patient.address}
 													</p>
 												</TooltipContent>
 											</Tooltip>
@@ -323,7 +323,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 							<div className="space-y-3">
 								{result.results.map((patient) => (
 									<FullPatientCard
-										key={patient.PatientKey}
+										key={patient.patientKey}
 										patient={patient}
 									/>
 								))}
@@ -333,7 +333,7 @@ export const SearchPatientsToolUI = makeAssistantToolUI<
 							<div className="space-y-2">
 								{result.results.map((patient) => (
 									<CompactPatientItem
-										key={patient.PatientKey}
+										key={patient.patientKey}
 										patient={patient}
 									/>
 								))}
