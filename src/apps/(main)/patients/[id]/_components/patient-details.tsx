@@ -297,11 +297,7 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
                         <div className="flex items-start justify-between">
                           <div>
                             <h4 className="font-semibold">Lần khám {index + 1}</h4>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge className="bg-blue-100 text-blue-800">
-                                {test.totalFiles} tệp tin
-                              </Badge>
-                            </div>
+
                           </div>
                           <div className="text-right text-sm text-muted-foreground">
                             <p>Ngày: {formatDate(test.date)}</p>
@@ -358,11 +354,6 @@ export function PatientDetails({ patient, onBack }: PatientDetailsProps) {
                         <div className="flex items-start justify-between">
                           <div>
                             <h4 className="font-semibold">Lần {index + 1}</h4>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge className="bg-green-100 text-green-800">
-                                {test.totalFiles} tệp tin
-                              </Badge>
-                            </div>
                           </div>
                           <div className="text-right text-sm text-muted-foreground">
                             <p>Ngày: {formatDate(test.date)}</p>
