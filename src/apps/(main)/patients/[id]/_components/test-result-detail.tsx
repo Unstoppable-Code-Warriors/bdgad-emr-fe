@@ -44,7 +44,8 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 			const urlObj = new URL(url)
 			const pathname = urlObj.pathname
 			const filename = pathname.split('/').pop() || 'download'
-			return filename
+			// Decode URL encoded characters (like %E1%BB%85n -> ễ)
+			return decodeURIComponent(filename)
 		} catch {
 			return 'download'
 		}
@@ -242,7 +243,16 @@ export function TestResultDetail({ testRunKey, testNumber, onBack }: TestResultD
 												<div className="flex items-center gap-3">
 													<FileText className="h-5 w-5 text-purple-600" />
 													<div>
-														<p className="text-sm font-medium text-gray-900 truncate max-w-[300px]" title={fileName}>
+														<p 
+															className="text-sm font-medium text-gray-900 truncate max-w-[300px]" 
+															title={fileName}
+															style={{ 
+																wordBreak: 'break-all',
+																overflow: 'hidden',
+																textOverflow: 'ellipsis',
+																whiteSpace: 'nowrap'
+															}}
+														>
 															{fileName}
 														</p>
 														<p className="text-xs text-gray-500">
